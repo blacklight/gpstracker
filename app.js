@@ -36,14 +36,16 @@ const GpsData = sequelize.define('GpsData', {
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
-// Routes
+// View route
 app.get('/', async (req, res) => {
   res.render('index')
 });
 
-app.get('/get', async (req, res) => {
+// API route
+app.get('/gpsdata', async (req, res) => {
+  const limit = req.query.limit || 100;
   const apiResponse = await GpsData.findAll({
-    limit: 1000,
+    limit: limit,
     offset: 0,
   });
 

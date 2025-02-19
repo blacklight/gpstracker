@@ -1,5 +1,5 @@
 async function getGpsData() {
-  return await fetch('/get')
+  return await fetch('/gpsdata')
 }
 
 document.addEventListener('DOMContentLoaded', () => {
