@@ -1,7 +1,9 @@
 <template>
   <div class="popup" :class="{ hidden: !point }" ref="popup">
     <div class="popup-content" v-if="point">
-      <button @click="$emit('close')">Close</button>
+      <div class="header">
+        <button @click="$emit('close')" title="Close">✕</button>
+      </div>
       <div class="point-info">
         <h2 class="address" v-if="point.address">{{ point.address }}</h2>
         <h2 class="latlng" v-else>{{ point.latitude }}, {{ point.longitude }}</h2>
@@ -89,6 +91,30 @@ export default {
   padding: 1em;
   border-radius: 1em;
   box-shadow: 2px 2px 2px 2px var(--color-border);
+
+  .popup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+  }
+
+  .header {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+
+    button {
+      background: none;
+      border: none;
+      color: var(--color-heading);
+      font-size: 1.2em;
+      cursor: pointer;
+
+      &:hover {
+        color: var(--color-accent);
+      }
+    }
+  }
 
   &.hidden {
     padding: 0;

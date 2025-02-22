@@ -13,6 +13,7 @@
 import Feature from 'ol/Feature';
 import GPSPoint from '../models/GPSPoint';
 import Map from 'ol/Map';
+import LineString from 'ol/geom/LineString';
 import OSM from 'ol/source/OSM';
 import Overlay from 'ol/Overlay';
 import Point from 'ol/geom/Point';
@@ -21,9 +22,9 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
-import { Circle, Fill, Style } from 'ol/style';
+import { Circle, Fill, Style, Stroke } from 'ol/style';
 import { useGeographic } from 'ol/proj';
-import { type Nullable } from '../models/Types';
+import type { Nullable } from '../models/Types';
 
 // @ts-ignore
 const baseURL = __API_PATH__
@@ -40,6 +41,7 @@ export default {
       loading: false,
       map: null as Nullable<Map>,
       popup: null as Nullable<Overlay>,
+      routeFeatures: [] as Feature[],
       selectedPoint: null as Nullable<GPSPoint>,
     }
   },
@@ -60,32 +62,41 @@ export default {
       }
     },
 
+    osmLayer() {
+      return new TileLayer({
+        source: new OSM(),
+      })
+    },
+
+    pointsLayer(points: Point[]) {
+      const pointFeatures = points.map((point: Point) => new Feature(point))
+      return new VectorLayer({
+        source: new VectorSource({
+          features: pointFeatures,
+        }),
+        style: new Style({
+          image: new Circle({
+            radius: 6,
+            fill: new Fill({ color: 'red' }),
+            stroke: new Stroke({ color: 'black', width: 1 }),
+          }),
+          zIndex: Infinity,  // Ensure that points are always displayed above other layers
+        }),
+      })
+    },
+
     createMap(gpsPoints: GPSPoint[]) {
       const points = gpsPoints.map((gps: GPSPoint) => {
         const point = new Point([gps.longitude, gps.latitude])
         return point
-      })
+      });
 
-      const pointFeatures = points.map((point: Point) => new Feature(point))
       const view = new View(this.getCenterAndZoom())
       const map = new Map({
         target: 'map',
         layers: [
-          new TileLayer({
-            source: new OSM(),
-          }),
-
-          new VectorLayer({
-            source: new VectorSource({
-              features: pointFeatures,
-            }),
-            style: new Style({
-              image: new Circle({
-                radius: 5,
-                fill: new Fill({ color: 'red' }),
-              }),
-            }),
-          }),
+          this.osmLayer(),
+          this.pointsLayer(points),
         ],
         view: view
       })
@@ -130,6 +141,8 @@ export default {
             this.selectedPoint = point
             // @ts-expect-error
             this.$refs.popup.setPosition(event.coordinate)
+            // Center the map on the selected point
+            map.getView().setCenter(event.coordinate)
           }
         } else {
           this.selectedPoint = null
