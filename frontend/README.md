@@ -1,55 +1,29 @@
-# GPSTracker
+# GPSTracker [frontend]
 
-##### Track your GPS data, from any data source
+This is the root folder for the GPSTracker frontend.
 
-GPSTracker is a simple Webapp that consists of:
+See [main `README`](../README.md) for more information.
 
-- A backend that:
-  - Can read GPS data from any compatible data source (supported: `postgres`, `mysql`, `mariadb`, `mongodb`, `sqlite`,
-    `snowflake`), with arbitrary complex filtering, and expose them over a simple Web API.
-  - [[*TODO*]] Can ingest GPS data points from HTTP, MQTT, Websocket or Kafka.
-- A frontend to display GPS data points and provides advanced filtering.
-
-## Building the application
+## Building the frontend
 
 ```sh
-# Backend
-npm install
-npm run build
-
-# Frontend
-cd frontend
 npm install
 npm run build
 ```
 
 ## Configuration
 
-See `.env.example` for a reference. Copy it to `.env` and modify it accordingly.
+Imported from the root level - see [`.env.example`](../.env.example).
 
-## Running the application
-
-### Local installation
+## Running the frontend
 
 ```sh
 npm run start
 ```
 
-### Docker
-
-[[*TODO*]]
-
 ## Project Setup
 
 ### Compile and Hot-Reload for Development
-
-#### Backend
-
-```sh
-npm run dev
-```
-
-#### Frontend
 
 ```sh
 cd frontend

@@ -1,43 +1,63 @@
-# GPS Tracker
+# GPSTracker
 
-A web interface to render GPS data points stored in a PostgreSQL database on a map.
+##### Track your GPS data, from any data source
 
-## Installation
+GPSTracker is a simple Webapp that consists of:
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/gps-tracker.git
-   cd gps-tracker
-   ```
+- A backend that:
+  - Can read GPS data from any compatible data source (supported: `postgres`, `mysql`, `mariadb`, `mongodb`, `sqlite`,
+    `snowflake`), with arbitrary complex filtering, and expose them over a simple Web API.
+  - [[*TODO*]] Can ingest GPS data points from HTTP, MQTT, Websocket or Kafka.
+- A frontend to display GPS data points and provides advanced filtering.
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+## Building the application
 
-3. Create a `.env` file with the following content:
-   ```env
-   DATABASE_URL=postgres://username:password@localhost:5432/gpstracker
-   PORT=3000
-   ```
+```sh
+# Backend
+npm install
+npm run build
 
-4. Create the `gps_data` table in your PostgreSQL database:
-   ```sql
-   CREATE TABLE gps_data (
-     id SERIAL PRIMARY KEY,
-     latitude FLOAT NOT NULL,
-     longitude FLOAT NOT NULL,
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
-   ```
+# Frontend
+cd frontend
+npm install
+npm run build
+```
 
-5. Start the server:
-   ```bash
-   npm start
-   ```
+## Configuration
 
-6. Open your browser and navigate to `http://localhost:3000`.
+See [`.env.example`](./.env.example) for a reference. Copy it to `.env` and modify it accordingly.
 
-## Usage
+## Running the application
 
-Add your GPS data points to the PostgreSQL ▋
+### Local installation
+
+```sh
+npm run start
+```
+
+### Docker
+
+[[*TODO*]]
+
+## Project Setup
+
+### Compile and Hot-Reload for Development
+
+#### Backend
+
+```sh
+npm run dev
+```
+
+#### Frontend
+
+```sh
+cd frontend
+npm run dev
+```
+
+### Lint with [ESLint](https://eslint.org/)
+
+```sh
+npm run lint
+```
