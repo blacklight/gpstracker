@@ -1,16 +1,40 @@
 {
-  "name": "gps-tracker",
+  "name": "server",
   "version": "1.0.0",
-  "description": "A web interface to render GPS data points on a map",
-  "main": "app.js",
+  "description": "",
+  "main": "main.js",
   "scripts": {
-    "start": "node app.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/main.js",
+    "dev": "nodemon",
+    "build": "tsc"
   },
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ],
+    "ignore": [
+      "dist"
+    ],
+    "exec": "tsc && node ./dist/main.js",
+    "ext": "ts,js,json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
   "dependencies": {
-    "dotenv": "^16.0.0",
-    "ejs": "^3.1.6",
-    "express": "^4.17.1",
-    "pg": "^8.7.1",
-    "sequelize": "^6.6.5"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.3",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.4",
+    "nodemon": "^3.1.9",
+    "typescript": "^5.7.3"
   }
 }
