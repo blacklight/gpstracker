@@ -5,11 +5,13 @@ import dotenv from 'dotenv';
 import { Db } from './db/Db';
 import { LocationRequest } from './models/LocationRequest';
 import { LocationRepository } from './repo/LocationRepository';
+import { logRequest } from './helpers/logging';
 
 dotenv.config();
 
 const app = express();
 const db = Db.fromEnv();
+const locationRepo = new LocationRepository(db);
 const address = process.env.BACKEND_ADDRESS || '127.0.0.1';
 const port = process.env.BACKEND_PORT || 3000;
 
@@ -19,7 +21,7 @@ app.use(express.static('frontend/dist'));
 
 // API route
 app.get('/api/gpsdata', async (req, res) => {
-  console.log(`[${req.ip}] GET ${req.originalUrl}`);
+  logRequest(req);
   let query: any = {};
 
   try {
@@ -32,7 +34,7 @@ app.get('/api/gpsdata', async (req, res) => {
   }
 
   try {
-    const gpsData = await new LocationRepository(db).getHistory(query);
+    const gpsData = await locationRepo.getHistory(query);
     res.json(gpsData);
   } catch (error) {
     const e = `Error fetching data: ${error}`;

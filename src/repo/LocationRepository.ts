@@ -13,7 +13,7 @@ export class LocationRepository {
     let apiResponse: any[] = [];
 
     try {
-      apiResponse = await this.db.GpsData().findAll(query.toMap());
+      apiResponse = await this.db.GpsData().findAll(query.toMap(this.db));
     } catch (error) {
       throw new Error(`Error fetching data: ${error}`);
     }
