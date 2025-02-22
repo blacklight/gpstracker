@@ -43,11 +43,12 @@ export default {
       popup: null as Nullable<Overlay>,
       routeFeatures: [] as Feature[],
       selectedPoint: null as Nullable<GPSPoint>,
+      latlngTolerance: 0.001,
     }
   },
 
   methods: {
-    async fetchData() {
+    async fetchPoints() {
       this.loading = true
       try {
         const response = await fetch(`${baseURL}/gpsdata`)
@@ -60,6 +61,38 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+
+    groupPoints(points: GPSPoint[]) {
+      if (!points.length) {
+        return []
+      }
+
+      const groupedPoints = []
+      let group: GPSPoint[] = []
+      let prevPoint: GPSPoint = points[0]
+
+      points.forEach((point: GPSPoint, index: number) => {
+        if (
+          index === 0 || (
+            Math.abs(point.latitude - prevPoint.latitude) < this.latlngTolerance &&
+            Math.abs(point.longitude - prevPoint.longitude) < this.latlngTolerance
+          )
+        ) {
+          group.push(point)
+        } else {
+          if (group.length)
+            groupedPoints.push(group[0])
+
+          group = [point]
+        }
+        prevPoint = point
+      })
+
+      if (group.length)
+        groupedPoints.push(group[0])
+
+      return groupedPoints
     },
 
     osmLayer() {
@@ -77,7 +110,7 @@ export default {
         style: new Style({
           image: new Circle({
             radius: 6,
-            fill: new Fill({ color: 'lightblue' }),
+            fill: new Fill({ color: 'aquamarine' }),
             stroke: new Stroke({ color: 'blue', width: 1 }),
           }),
           zIndex: Infinity,  // Ensure that points are always displayed above other layers
@@ -203,7 +236,7 @@ export default {
   },
 
   async mounted() {
-    this.gpsPoints = await this.fetchData()
+    this.gpsPoints = this.groupPoints(await this.fetchPoints())
     this.map = this.createMap(this.gpsPoints)
   },
 }
