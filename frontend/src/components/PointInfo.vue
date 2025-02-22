@@ -128,6 +128,7 @@ export default {
 
   p.latlng {
     font-size: 0.8em;
+    margin: -0.25em 0 0.25em 0;
   }
 
   .timestamp {

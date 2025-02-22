@@ -77,10 +77,36 @@ export default {
         style: new Style({
           image: new Circle({
             radius: 6,
-            fill: new Fill({ color: 'red' }),
-            stroke: new Stroke({ color: 'black', width: 1 }),
+            fill: new Fill({ color: 'lightblue' }),
+            stroke: new Stroke({ color: 'blue', width: 1 }),
           }),
           zIndex: Infinity,  // Ensure that points are always displayed above other layers
+        }),
+      })
+    },
+
+    routeLayer(points: Point[]) {
+      this.routeFeatures = []
+      points.forEach((point: Point, index: number) => {
+        if (index === 0) {
+          return
+        }
+
+        const route = new LineString([points[index - 1].getCoordinates(), point.getCoordinates()])
+        const routeFeature = new Feature(route)
+        this.routeFeatures.push(routeFeature)
+      })
+
+      return new VectorLayer({
+        source: new VectorSource({
+          // @ts-ignore
+          features: this.routeFeatures,
+        }),
+        style: new Style({
+          stroke: new Stroke({
+            color: 'cornflowerblue',
+            width: 2,
+          }),
         }),
       })
     },
@@ -97,6 +123,7 @@ export default {
         layers: [
           this.osmLayer(),
           this.pointsLayer(points),
+          this.routeLayer(points),
         ],
         view: view
       })
@@ -104,6 +131,7 @@ export default {
       // @ts-expect-error
       this.$refs.popup.bindPopup(map)
       this.bindClick(map)
+      this.bindPointerMove(map)
       return map
     },
 
@@ -146,6 +174,29 @@ export default {
           }
         } else {
           this.selectedPoint = null
+        }
+      })
+    },
+
+    bindPointerMove(map: Map) {
+      map.on('pointermove', (event) => {
+        const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => feature)
+        const target = map.getTargetElement()
+        if (!target) {
+          return
+        }
+
+        if (feature) {
+          // @ts-expect-error
+          const coords = feature.getGeometry()?.getCoordinates()
+          if (coords?.length === 2 && coords.every((coord: number) => !isNaN(coord))) {
+            target.title = `${coords[1].toFixed(6)}, ${coords[0].toFixed(6)}`
+          }
+
+          target.style.cursor = 'pointer'
+        } else {
+          target.style.cursor = ''
+          target.title = ''
         }
       })
     },
