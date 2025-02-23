@@ -3,35 +3,56 @@
     <div class="loading" v-if="loading">Loading...</div>
     <div class="map-wrapper" v-else>
       <div id="map">
-        <PointInfo :point="selectedPoint" ref="popup" @close="selectedPoint = null" />
+        <PointInfo :point="selectedPoint"
+                   ref="popup"
+                   @close="selectedPoint = null" />
+
+        <div class="controls">
+          <div class="form-container" v-if="showControls">
+            <FilterForm :value="locationQuery" @refresh="locationQuery = $event" />
+          </div>
+          <FilterButton @input="showControls = !showControls"
+                        :value="showControls" />
+        </div>
       </div>
     </div>
   </main>
 </template>
 
 <script lang="ts">
-import Feature from 'ol/Feature';
-import GPSPoint from '../models/GPSPoint';
 import Map from 'ol/Map';
-import LineString from 'ol/geom/LineString';
-import OSM from 'ol/source/OSM';
 import Overlay from 'ol/Overlay';
 import Point from 'ol/geom/Point';
 import PointInfo from './PointInfo.vue';
 import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
 import View from 'ol/View';
-import TileLayer from 'ol/layer/Tile';
-import { Circle, Fill, Style, Stroke } from 'ol/style';
 import { useGeographic } from 'ol/proj';
-import type { Nullable } from '../models/Types';
 
-// @ts-ignore
-const baseURL = __API_PATH__
+import type { Nullable } from '../models/Types';
+import Api from '../mixins/Api.vue';
+import FilterButton from './filter/ToggleButton.vue';
+import FilterForm from './filter/Form.vue';
+import GPSPoint from '../models/GPSPoint';
+import LocationQuery from '../models/LocationQuery';
+import MapView from '../mixins/MapView.vue';
+import Points from '../mixins/Points.vue';
+import Routes from '../mixins/Routes.vue';
+import URLQueryHandler from '../mixins/URLQueryHandler.vue';
+
 useGeographic()
 
 export default {
+  mixins: [
+    Api,
+    MapView,
+    Points,
+    Routes,
+    URLQueryHandler,
+  ],
+
   components: {
+    FilterButton,
+    FilterForm,
     PointInfo,
   },
 
@@ -39,159 +60,57 @@ export default {
     return {
       gpsPoints: [] as GPSPoint[],
       loading: false,
+      locationQuery: new LocationQuery({}),
       map: null as Nullable<Map>,
+      mapView: null as Nullable<View>,
+      pointsLayer: null as Nullable<VectorLayer>,
       popup: null as Nullable<Overlay>,
-      routeFeatures: [] as Feature[],
+      routesLayer: null as Nullable<VectorLayer>,
       selectedPoint: null as Nullable<GPSPoint>,
-      latlngTolerance: 0.001,
+      showControls: false,
     }
   },
 
   methods: {
-    async fetchPoints() {
+    async fetch(): Promise<GPSPoint[]> {
       this.loading = true
       try {
-        const response = await fetch(`${baseURL}/gpsdata`)
-        return (await response.json())
-          .map((gps: any) => {
-            return new GPSPoint(gps)
-          })
+        return this.fetchPoints(this.locationQuery)
       } catch (error) {
         console.error(error)
+        return []
       } finally {
         this.loading = false
       }
     },
 
-    groupPoints(points: GPSPoint[]) {
-      if (!points.length) {
-        return []
-      }
-
-      const groupedPoints = []
-      let group: GPSPoint[] = []
-      let prevPoint: GPSPoint = points[0]
-
-      points.forEach((point: GPSPoint, index: number) => {
-        if (
-          index === 0 || (
-            Math.abs(point.latitude - prevPoint.latitude) < this.latlngTolerance &&
-            Math.abs(point.longitude - prevPoint.longitude) < this.latlngTolerance
-          )
-        ) {
-          group.push(point)
-        } else {
-          if (group.length)
-            groupedPoints.push(group[0])
-
-          group = [point]
-        }
-        prevPoint = point
-      })
-
-      if (group.length)
-        groupedPoints.push(group[0])
-
-      return groupedPoints
-    },
-
-    osmLayer() {
-      return new TileLayer({
-        source: new OSM(),
-      })
-    },
-
-    pointsLayer(points: Point[]) {
-      const pointFeatures = points.map((point: Point) => new Feature(point))
-      return new VectorLayer({
-        source: new VectorSource({
-          features: pointFeatures,
-        }),
-        style: new Style({
-          image: new Circle({
-            radius: 6,
-            fill: new Fill({ color: 'aquamarine' }),
-            stroke: new Stroke({ color: 'blue', width: 1 }),
-          }),
-          zIndex: Infinity,  // Ensure that points are always displayed above other layers
-        }),
-      })
-    },
-
-    routeLayer(points: Point[]) {
-      this.routeFeatures = []
-      points.forEach((point: Point, index: number) => {
-        if (index === 0) {
-          return
-        }
-
-        const route = new LineString([points[index - 1].getCoordinates(), point.getCoordinates()])
-        const routeFeature = new Feature(route)
-        this.routeFeatures.push(routeFeature)
-      })
-
-      return new VectorLayer({
-        source: new VectorSource({
-          // @ts-ignore
-          features: this.routeFeatures,
-        }),
-        style: new Style({
-          stroke: new Stroke({
-            color: 'cornflowerblue',
-            width: 2,
-          }),
-        }),
-      })
-    },
-
-    createMap(gpsPoints: GPSPoint[]) {
-      const points = gpsPoints.map((gps: GPSPoint) => {
-        const point = new Point([gps.longitude, gps.latitude])
-        return point
-      });
-
-      const view = new View(this.getCenterAndZoom())
+    createMap(gpsPoints: GPSPoint[]): Map {
+      const points = gpsPoints.map((gps: GPSPoint) => new Point([gps.longitude, gps.latitude]))
+      this.pointsLayer = this.createPointsLayer(points)
+      this.routesLayer = this.createRoutesLayer(points)
+      this.mapView = this.createMapView(gpsPoints)
       const map = new Map({
         target: 'map',
         layers: [
-          this.osmLayer(),
-          this.pointsLayer(points),
-          this.routeLayer(points),
+          this.createMapLayer(),
+          this.pointsLayer,
+          this.routesLayer,
         ],
-        view: view
+        view: this.mapView,
       })
 
-      // @ts-expect-error
+      // @ts-ignore
       this.$refs.popup.bindPopup(map)
       this.bindClick(map)
       this.bindPointerMove(map)
       return map
     },
 
-    getCenterAndZoom() {
-      if (!this.gpsPoints?.length) {
-        return {
-          center: [0, 0],
-          zoom: 2,
-        }
-      }
-
-      let [minX, minY, maxX, maxY] = [Infinity, Infinity, -Infinity, -Infinity]
-      this.gpsPoints.forEach((gps: GPSPoint) => {
-        minX = Math.min(minX, gps.longitude)
-        minY = Math.min(minY, gps.latitude)
-        maxX = Math.max(maxX, gps.longitude)
-        maxY = Math.max(maxY, gps.latitude)
-      })
-
-      const center = [(minX + maxX) / 2, (minY + maxY) / 2]
-      const zoom = Math.max(2, Math.min(18, 18 - Math.log2(Math.max(maxX - minX, maxY - minY))))
-      return { center, zoom }
-    },
-
     bindClick(map: Map) {
       map.on('click', (event) => {
+        this.showControls = false
         const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => feature)
+
         if (feature) {
           const point = this.gpsPoints.find((gps: GPSPoint) => {
             const [longitude, latitude] = (feature.getGeometry() as any).getCoordinates()
@@ -200,7 +119,7 @@ export default {
 
           if (point) {
             this.selectedPoint = point
-            // @ts-expect-error
+            // @ts-ignore
             this.$refs.popup.setPosition(event.coordinate)
             // Center the map on the selected point
             map.getView().setCenter(event.coordinate)
@@ -211,38 +130,40 @@ export default {
       })
     },
 
-    bindPointerMove(map: Map) {
-      map.on('pointermove', (event) => {
-        const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => feature)
-        const target = map.getTargetElement()
-        if (!target) {
-          return
-        }
+    initQuery() {
+      const urlQuery = this.parseQuery(window.location.href)
+      if (!Object.keys(urlQuery).length) {
+        this.setQuery(this.locationQuery)
+      } else {
+        this.locationQuery = new LocationQuery(urlQuery)
+      }
+    },
+  },
 
-        if (feature) {
-          // @ts-expect-error
-          const coords = feature.getGeometry()?.getCoordinates()
-          if (coords?.length === 2 && coords.every((coord: number) => !isNaN(coord))) {
-            target.title = `${coords[1].toFixed(6)}, ${coords[0].toFixed(6)}`
-          }
-
-          target.style.cursor = 'pointer'
-        } else {
-          target.style.cursor = ''
-          target.title = ''
-        }
-      })
+  watch: {
+    locationQuery: {
+      async handler() {
+        this.setQuery(this.locationQuery)
+        this.gpsPoints = this.groupPoints(await this.fetch())
+        const points = this.gpsPoints.map((gps: GPSPoint) => new Point([gps.longitude, gps.latitude]))
+        this.refreshMapView(this.mapView, this.gpsPoints)
+        this.refreshPointsLayer(this.pointsLayer, points)
+        this.refreshRoutesLayer(this.routesLayer, points)
+      },
+      deep: true,
     },
   },
 
   async mounted() {
-    this.gpsPoints = this.groupPoints(await this.fetchPoints())
+    this.initQuery()
+    this.gpsPoints = this.groupPoints(await this.fetch())
     this.map = this.createMap(this.gpsPoints)
   },
 }
 </script>
 
 <style lang="scss" scoped>
+@use "@/styles/common.scss" as *;
 @import "ol/ol.css";
 
 html,
@@ -256,6 +177,34 @@ body {
   top: 0;
   bottom: 0;
   width: 100%;
+
+  .controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5em;
+    z-index: 1;
+
+    @include mobile {
+      bottom: 1em;
+    }
+
+    .form-container {
+      margin-bottom: 0.5em;
+      animation: unroll 0.25s ease-out;
+    }
+  }
+}
+
+@keyframes unroll {
+  from {
+    transform: translateY(7.5em);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 :deep(.ol-viewport) {

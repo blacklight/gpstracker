@@ -74,6 +74,7 @@
   --color-heading: var(--vt-c-text-light-1);
   --color-text: var(--vt-c-text-light-1);
   --color-accent: var(--vt-c-blue-fg-light);
+  --color-hover: var(--vt-c-blue-fg-dark);
 
   --section-gap: 160px;
 }

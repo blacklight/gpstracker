@@ -1,3 +1,3 @@
 export function logRequest(req: any) {
-  console.log(`Request: ${req.method} ${req.url}`);
+  console.log(`[${req.ip}] ${req.method} ${req.url}`);
 }
