@@ -17,7 +17,7 @@ export default {
         }),
         style: new Style({
           stroke: new Stroke({
-            color: 'cornflowerblue',
+            color: '#0050ff80',
             width: 3,
           }),
         }),
