@@ -74,15 +74,34 @@
       </div>
     </div>
 
-    <div class="limit-container input-text-container">
-      <label for="limit">Limit</label>
-      <input type="number"
-             id="limit"
-             name="limit"
-             @input="newFilter.limit = Number($event.target.value)"
-             @change="newFilter.limit = Number($event.target.value)"
-             :value="newFilter.limit"
-             min="1" />
+    <div class="pagination-container">
+      <div class="page-button-container">
+        <button type="button"
+                @click="$emit('prev-page')"
+                title="Previous Results"
+                :disabled="!hasPrev">
+          <font-awesome-icon icon="fas fa-chevron-left" />
+        </button>
+      </div>
+      <div class="limit-container">
+        <label for="limit">Max Results</label>
+        <input type="number"
+               id="limit"
+               name="limit"
+               @input="newFilter.limit = Number($event.target.value)"
+               @change="newFilter.limit = Number($event.target.value)"
+               :value="newFilter.limit"
+               min="1" />
+      </div>
+
+      <div class="page-button-container">
+        <button type="button"
+                @click="$emit('next-page')"
+                title="Next Results"
+                :disabled="!hasNext">
+          <font-awesome-icon icon="fas fa-chevron-right" />
+        </button>
+      </div>
     </div>
 
     <div class="footer">
@@ -95,9 +114,21 @@
 import _ from 'lodash'
 
 export default {
-  emit: ['refresh'],
+  emit: [
+    'next-page',
+    'prev-page',
+    'refresh',
+  ],
   props: {
     value: Object,
+    hasPrev: {
+      type: Boolean,
+      default: true,
+    },
+    hasNext: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   computed: {
@@ -269,32 +300,30 @@ export default {
         margin-top: 0.5em;
 
         button {
-          padding: 0.25em 0.5em;
           margin-right: 0.25em;
-          border: 1px solid var(--color-border);
-          border-radius: 0.25em;
-          background: var(--color-background);
           font-size: 0.75em;
-          cursor: pointer;
-
-          &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-          }
-
-          &:hover {
-            color: var(--color-hover);
-          }
         }
       }
     }
   }
 
-  .input-text-container {
+  .pagination-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
     margin: 0.5em;
+
+    .limit-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .page-button-container {
+      display: flex;
+      justify-content: center;
+    }
 
     label {
       margin-bottom: 0.25em;

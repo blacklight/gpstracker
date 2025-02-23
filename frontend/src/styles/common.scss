@@ -22,3 +22,30 @@ $screen-lg: 1200px;
     @content;
   }
 }
+
+// Common element styles
+
+button {
+  margin: 0 0.5em;
+  padding: 0.25em 0.5em;
+  border: 1px solid var(--color-border);
+  border-radius: 0.25em;
+  background: var(--color-background);
+  font-size: 1.25em;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover {
+    color: var(--color-hover);
+  }
+}
+
+button[type=submit] {
+  margin: 0.5em;
+  font-size: 1.15em;
+  padding: 0.5em;
+}

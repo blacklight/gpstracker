@@ -1,5 +1,5 @@
 <template>
-  <button :class="{ 'selected': value }"
+  <button class="toggle-button" :class="{ 'selected': value }"
           @click="$emit('input')"
           :title="title"
           :aria-pressed="value"
@@ -24,21 +24,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-button {
+button.toggle-button {
   background: var(--color-background);
   color: var(--color-text);
   width: 4em;
   height: 4em;
+  font-size: 1em;
   padding: 1.5em;
   outline: none;
   border: none;
   border-radius: 50%;
   box-shadow: 1px 1px 2px 2px var(--color-border);
   cursor: pointer;
-
-  &:hover {
-    color: var(--color-accent) !important;
-  }
 
   &.selected {
     background: var(--color-accent);
