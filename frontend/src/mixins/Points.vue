@@ -75,6 +75,12 @@ export default {
       source.changed()
     },
 
+    toMappedPoints(gpsPoints: GPSPoint[]): Point[] {
+      return this.groupPoints(gpsPoints).map(
+        (gps: GPSPoint) => new Point([gps.longitude, gps.latitude])
+      )
+    },
+
     getCenterAndZoom(points: GPSPoint[]) {
       if (!points?.length) {
         return {

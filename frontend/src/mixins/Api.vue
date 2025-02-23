@@ -26,8 +26,13 @@ export default {
 
       return (await response.json())
         .map((gps: any) => {
-          return new GPSPoint(gps)
+          return new GPSPoint({
+            ...gps,
+            // Normalize timestamp to Date object
+            timestamp: new Date(gps.timestamp),
+          })
         })
+        .sort((a: GPSPoint, b: GPSPoint) => a.timestamp.getTime() - b.timestamp.getTime())
     },
   },
 }

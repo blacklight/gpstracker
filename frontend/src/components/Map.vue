@@ -9,7 +9,14 @@
 
         <div class="controls">
           <div class="form-container" v-if="showControls">
-            <FilterForm :value="locationQuery" @refresh="locationQuery = $event" />
+            <FilterForm :value="locationQuery"
+                        :disabled="loading"
+                        :has-next-page="hasNextPage"
+                        :has-prev-page="hasPrevPage"
+                        @refresh="locationQuery = $event"
+                        @reset-page="locationQuery.minId = locationQuery.maxId = undefined"
+                        @next-page="fetchNextPage"
+                        @prev-page="fetchPrevPage" />
           </div>
           <FilterButton @input="showControls = !showControls"
                         :value="showControls" />
@@ -35,6 +42,7 @@ import FilterForm from './filter/Form.vue';
 import GPSPoint from '../models/GPSPoint';
 import LocationQuery from '../models/LocationQuery';
 import MapView from '../mixins/MapView.vue';
+import Paginate from '../mixins/Paginate.vue';
 import Points from '../mixins/Points.vue';
 import Routes from '../mixins/Routes.vue';
 import URLQueryHandler from '../mixins/URLQueryHandler.vue';
@@ -45,6 +53,7 @@ export default {
   mixins: [
     Api,
     MapView,
+    Paginate,
     Points,
     Routes,
     URLQueryHandler,
@@ -58,13 +67,14 @@ export default {
 
   data() {
     return {
-      gpsPoints: [] as GPSPoint[],
       loading: false,
       locationQuery: new LocationQuery({}),
       map: null as Nullable<Map>,
+      mappedPoints: [] as Point[],
       mapView: null as Nullable<View>,
       pointsLayer: null as Nullable<VectorLayer>,
       popup: null as Nullable<Overlay>,
+      queryInitialized: false,
       routesLayer: null as Nullable<VectorLayer>,
       selectedPoint: null as Nullable<GPSPoint>,
       showControls: false,
@@ -84,11 +94,29 @@ export default {
       }
     },
 
+    fetchNextPage() {
+      const nextPageQuery = this.nextPageQuery()
+      if (!nextPageQuery) {
+        return
+      }
+
+      this.locationQuery = nextPageQuery
+    },
+
+    fetchPrevPage() {
+      const prevPageQuery = this.prevPageQuery()
+      if (!prevPageQuery) {
+        return
+      }
+
+      this.locationQuery = prevPageQuery
+    },
+
     createMap(gpsPoints: GPSPoint[]): Map {
-      const points = gpsPoints.map((gps: GPSPoint) => new Point([gps.longitude, gps.latitude]))
-      this.pointsLayer = this.createPointsLayer(points)
-      this.routesLayer = this.createRoutesLayer(points)
-      this.mapView = this.createMapView(gpsPoints)
+      this.mappedPoints = this.toMappedPoints(gpsPoints)
+      this.pointsLayer = this.createPointsLayer(this.mappedPoints)
+      this.routesLayer = this.createRoutesLayer(this.mappedPoints)
+      this.mapView = this.mapView || this.createMapView(gpsPoints)
       const map = new Map({
         target: 'map',
         layers: [
@@ -142,13 +170,56 @@ export default {
 
   watch: {
     locationQuery: {
-      async handler() {
-        this.setQuery(this.locationQuery)
-        this.gpsPoints = this.groupPoints(await this.fetch())
-        const points = this.gpsPoints.map((gps: GPSPoint) => new Point([gps.longitude, gps.latitude]))
-        this.refreshMapView(this.mapView, this.gpsPoints)
-        this.refreshPointsLayer(this.pointsLayer, points)
-        this.refreshRoutesLayer(this.routesLayer, points)
+      async handler(newQuery, oldQuery) {
+        const isFirstQuery = !this.queryInitialized
+
+        // If startDate/endDate have changed, reset minId/maxId
+        if (!isFirstQuery &&
+          (newQuery.startDate !== oldQuery.startDate || newQuery.endDate !== oldQuery.endDate)
+        ) {
+          newQuery.minId = undefined
+          newQuery.maxId = undefined
+          this.hasNextPage = true
+          this.hasPrevPage = true
+        }
+
+        // Results with maxId should be retrieved in descending order,
+        // otherwise all results should be retrieved in ascending order
+        newQuery.order = newQuery.maxId ? 'desc' : 'asc'
+        this.setQuery(newQuery)
+        this.queryInitialized = true
+
+        if (!isFirstQuery) {
+          const gpsPoints = await this.fetch()
+
+          // If there are no points, and minId/maxId are set, reset them
+          // and don't update the map (it means that we have reached the
+          // start/end of the current window)
+          if (gpsPoints.length < 2 && (newQuery.minId || newQuery.maxId)) {
+            if (newQuery.minId) {
+              this.hasNextPage = false
+            }
+
+            if (newQuery.maxId) {
+              this.hasPrevPage = false
+            }
+
+            newQuery.minId = oldQuery.minId
+            newQuery.maxId = oldQuery.maxId
+            return
+          }
+
+          this.gpsPoints = gpsPoints
+          this.hasNextPage = gpsPoints.length > 1
+          this.hasPrevPage = gpsPoints.length > 1
+        }
+
+        this.mappedPoints = this.toMappedPoints(this.gpsPoints)
+        if (this.mapView) {
+          this.refreshMapView(this.mapView, this.gpsPoints)
+          this.refreshPointsLayer(this.pointsLayer, this.mappedPoints)
+          this.refreshRoutesLayer(this.routesLayer, this.mappedPoints)
+        }
       },
       deep: true,
     },
@@ -156,7 +227,7 @@ export default {
 
   async mounted() {
     this.initQuery()
-    this.gpsPoints = this.groupPoints(await this.fetch())
+    this.gpsPoints = await this.fetch()
     this.map = this.createMap(this.gpsPoints)
   },
 }

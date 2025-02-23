@@ -11,30 +11,31 @@
                @input="newFilter.startDate = startPlusHours($event.target.value, 0)"
                @change="newFilter.startDate = startPlusHours($event.target.value, 0)"
                :value="toLocalString(newFilter.startDate)"
+               :disabled="disabled"
                :max="maxDate" />
 
         <div class="footer">
           <button type="button"
                   @click="newFilter.startDate = startPlusDays(newFilter.startDate, -7)"
-                  :disabled="!newFilter.startDate">-1w</button>
+                  :disabled="disabled || !newFilter.startDate">-1w</button>
           <button type="button"
                   @click="newFilter.startDate = startPlusDays(newFilter.startDate, -1)"
-                  :disabled="!newFilter.startDate">-1d</button>
+                  :disabled="disabled || !newFilter.startDate">-1d</button>
           <button type="button"
                   @click="newFilter.startDate = startPlusHours(newFilter.startDate, -1)"
-                  :disabled="!newFilter.startDate">-1h</button>
+                  :disabled="disabled || !newFilter.startDate">-1h</button>
           <button type="button"
                   @click="newFilter.startDate = startPlusDays(new Date(), 0)"
-                  :disabled="!newFilter.startDate">Now</button>
+                  :disabled="disabled || !newFilter.startDate">Now</button>
           <button type="button"
                   @click="newFilter.startDate = startPlusHours(newFilter.startDate, 1)"
-                  :disabled="!newFilter.startDate">+1h</button>
+                  :disabled="disabled || !newFilter.startDate">+1h</button>
           <button type="button"
                   @click="newFilter.startDate = startPlusDays(newFilter.startDate, 1)"
-                  :disabled="!newFilter.startDate">+1d</button>
+                  :disabled="disabled || !newFilter.startDate">+1d</button>
           <button type="button"
                   @click="newFilter.startDate = startPlusDays(newFilter.startDate, 7)"
-                  :disabled="!newFilter.startDate">+1w</button>
+                  :disabled="disabled || !newFilter.startDate">+1w</button>
         </div>
       </div>
 
@@ -46,30 +47,31 @@
                @input="newFilter.endDate = endPlusHours($event.target.value, 0)"
                @change="newFilter.endDate = endPlusHours($event.target.value, 0)"
                :value="toLocalString(newFilter.endDate)"
+               :disabled="disabled"
                :max="maxDate" />
 
         <div class="footer">
           <button type="button"
                   @click="newFilter.endDate = endPlusDays(newFilter.endDate, -7)"
-                  :disabled="!newFilter.endDate">-1w</button>
+                  :disabled="disabled || !newFilter.endDate">-1w</button>
           <button type="button"
                   @click="newFilter.endDate = endPlusDays(newFilter.endDate, -1)"
-                  :disabled="!newFilter.endDate">-1d</button>
+                  :disabled="disabled || !newFilter.endDate">-1d</button>
           <button type="button"
                   @click="newFilter.endDate = endPlusHours(newFilter.endDate, -1)"
-                  :disabled="!newFilter.endDate">-1h</button>
+                  :disabled="disabled || !newFilter.endDate">-1h</button>
           <button type="button"
                   @click="newFilter.endDate = endPlusDays(new Date(), 0)"
-                  :disabled="!newFilter.endDate">Now</button>
+                  :disabled="disabled || !newFilter.endDate">Now</button>
           <button type="button"
                   @click="newFilter.endDate = endPlusHours(newFilter.endDate, 1)"
-                  :disabled="!newFilter.endDate">+1h</button>
+                  :disabled="disabled || !newFilter.endDate">+1h</button>
           <button type="button"
                   @click="newFilter.endDate = endPlusDays(newFilter.endDate, 1)"
-                  :disabled="!newFilter.endDate">+1d</button>
+                  :disabled="disabled || !newFilter.endDate">+1d</button>
           <button type="button"
                   @click="newFilter.endDate = endPlusDays(newFilter.endDate, 7)"
-                  :disabled="!newFilter.endDate">+1w</button>
+                  :disabled="disabled || !newFilter.endDate">+1w</button>
         </div>
       </div>
     </div>
@@ -77,9 +79,18 @@
     <div class="pagination-container">
       <div class="page-button-container">
         <button type="button"
+                :disabled="disabled"
+                v-if="value.minId || value.maxId"
+                @click.stop="$emit('reset-page')">
+          <font-awesome-icon icon="fas fa-undo" />
+        </button>
+      </div>
+
+      <div class="page-button-container">
+        <button type="button"
                 @click="$emit('prev-page')"
                 title="Previous Results"
-                :disabled="!hasPrev">
+                :disabled="disabled || !hasPrevPage">
           <font-awesome-icon icon="fas fa-chevron-left" />
         </button>
       </div>
@@ -91,6 +102,7 @@
                @input="newFilter.limit = Number($event.target.value)"
                @change="newFilter.limit = Number($event.target.value)"
                :value="newFilter.limit"
+               :disabled="disabled"
                min="1" />
       </div>
 
@@ -98,14 +110,16 @@
         <button type="button"
                 @click="$emit('next-page')"
                 title="Next Results"
-                :disabled="!hasNext">
+                :disabled="disabled || !hasNextPage">
           <font-awesome-icon icon="fas fa-chevron-right" />
         </button>
       </div>
     </div>
 
     <div class="footer">
-      <button type="submit" :disabled="!changed">Apply</button>
+      <button type="submit" :disabled="disabled || !changed">
+        <font-awesome-icon icon="fas fa-check" />&nbsp;Apply
+      </button>
     </div>
   </form>
 </template>
@@ -117,15 +131,20 @@ export default {
   emit: [
     'next-page',
     'prev-page',
+    'reset-page',
     'refresh',
   ],
   props: {
     value: Object,
-    hasPrev: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    hasPrevPage: {
       type: Boolean,
       default: true,
     },
-    hasNext: {
+    hasNextPage: {
       type: Boolean,
       default: true,
     },
@@ -332,6 +351,10 @@ export default {
     input {
       width: 100%;
     }
+  }
+
+  button[type=submit] {
+    min-width: 10em;
   }
 }
 </style>

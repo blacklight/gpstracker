@@ -1,4 +1,5 @@
 class GPSPoint {
+  public id: number;
   public latitude: number;
   public longitude: number;
   public altitude: number;
@@ -9,6 +10,7 @@ class GPSPoint {
   public timestamp: Date;
 
   constructor(public data: any) {
+    this.id = data.id;
     this.latitude = data.latitude;
     this.longitude = data.longitude;
     this.altitude = data.altitude;

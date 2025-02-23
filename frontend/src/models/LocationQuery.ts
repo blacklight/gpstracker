@@ -1,6 +1,6 @@
 class LocationQuery {
   public limit: number = 250;
-  public offset: number = 0;
+  public offset: number | null = null;
   public startDate: Date | null = null;
   public endDate: Date | null = null;
   public minId: number | null = null;
@@ -8,6 +8,7 @@ class LocationQuery {
   public country: string | null = null;
   public locality: string | null = null;
   public postalCode: string | null = null;
+  public order: string = 'asc';
 
   constructor(public data: any) {
     this.limit = data.limit || this.limit;
@@ -19,6 +20,7 @@ class LocationQuery {
     this.country = data.country || this.country;
     this.locality = data.locality || this.locality;
     this.postalCode = data.postalCode || this.postalCode;
+    this.order = data.order || this.order;
 
     if (!(this.startDate && this.endDate)) {
       // Default to the past 24 hours

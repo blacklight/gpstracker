@@ -25,7 +25,8 @@ class LocationRequest {
     this.country = req.country;
     this.locality = req.locality;
     this.postalCode = req.postalCode;
-    this.orderBy = req.orderBy || 'timestamp';
+    this.orderBy = req.orderBy || this.orderBy;
+    this.order = req.order || this.order;
   }
 
   private initNumber(key: string, req: any): void {
@@ -93,7 +94,7 @@ class LocationRequest {
     }
 
     queryMap.where = where;
-    queryMap.order = [[colMapping[this.orderBy], this.order]];
+    queryMap.order = [[colMapping[this.orderBy], this.order.toUpperCase()]];
     return queryMap;
   }
 }
