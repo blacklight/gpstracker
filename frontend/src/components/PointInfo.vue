@@ -6,8 +6,22 @@
       </div>
       <div class="point-info">
         <h2 class="address" v-if="point.address">{{ point.address }}</h2>
-        <h2 class="latlng" v-else>{{ point.latitude }}, {{ point.longitude }}</h2>
-        <p class="latlng" v-if="point.address">{{ point.latitude }}, {{ point.longitude }}</p>
+        <h2 class="latlng" v-else>
+          <a :href="osmUrl" target="_blank" rel="noopener noreferrer">
+            <font-awesome-icon icon="fas fa-map-marker-alt" />
+            {{ point.latitude }}, {{ point.longitude }}
+          </a>
+        </h2>
+        <p class="latlng" v-if="point.address">
+          <a :href="osmUrl" target="_blank" rel="noopener noreferrer">
+            <font-awesome-icon icon="fas fa-map-marker-alt" />
+            {{ point.latitude }}, {{ point.longitude }}
+          </a>
+        </p>
+        <p class="altitude" v-if="point.altitude">
+          <font-awesome-icon icon="fas fa-mountain" />
+          {{ point.altitude }} m
+        </p>
         <p class="locality" v-if="point.locality">{{ point.locality }}</p>
         <p class="postal-code" v-if="point.postalCode">{{ point.postalCode }}</p>
         <p class="country" v-if="country">
@@ -57,6 +71,10 @@ export default {
 
     countryFlag() {
       return this.country ? getEmojiFlag(this.country.iso2 as TCountryCode) : null
+    },
+
+    osmUrl(): string {
+      return `https://www.openstreetmap.org/?mlat=${this.point?.latitude}&mlon=${this.point?.longitude}`
     },
 
     timeString(): string | null {
@@ -129,7 +147,7 @@ export default {
     pointer-events: none;
   }
 
-  p.latlng {
+  p.latlng, p.altitude {
     font-size: 0.8em;
     margin: -0.25em 0 0.25em 0;
   }
