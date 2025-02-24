@@ -3,6 +3,22 @@
     <div class="loading" v-if="loading">Loading...</div>
     <div class="map-wrapper" v-else>
       <div id="map">
+        <div class="time-range" v-if="gpsPoints?.length">
+          <div class="row">
+            <div class="key">From</div>
+            <div class="value">{{ displayedDate(oldestPoint?.timestamp) }}</div>
+          </div>
+          <div class="row">
+            <div class="key">To</div>
+            <div class="value">{{ displayedDate(newestPoint?.timestamp) }}</div>
+          </div>
+
+          <div class="row">
+            <div class="key">Total Distance</div>
+            <div class="value">{{ displayDistance(getTotalDistance(gpsPoints)) }}</div>
+          </div>
+        </div>
+
         <PointInfo :point="selectedPoint"
                    ref="popup"
                    @close="selectedPoint = null" />
@@ -166,6 +182,14 @@ export default {
         this.locationQuery = new LocationQuery(urlQuery)
       }
     },
+
+    displayedDate(date: Date | number | string | null): string {
+      if (!date) {
+        return '-'
+      }
+
+      return new Date(date).toString().replace(/GMT.*/, '')
+    },
   },
 
   watch: {
@@ -265,6 +289,30 @@ body {
     .form-container {
       margin-bottom: 0.5em;
       animation: unroll 0.25s ease-out;
+    }
+  }
+
+  .time-range {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5em;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 0.25em;
+    z-index: 1;
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.25em;
+
+      .key {
+        margin-right: 1em;
+      }
+
+      .value {
+        font-weight: bold;
+      }
     }
   }
 }

@@ -51,6 +51,26 @@ export default {
       return groupedPoints
     },
 
+    getTotalDistance(points: GPSPoint[]) {
+      let totalDistance = 0
+      let prevPoint: GPSPoint = points[0]
+
+      points.forEach((point: GPSPoint) => {
+        totalDistance += this.latLngToDistance(point, prevPoint)
+        prevPoint = point
+      })
+
+      return totalDistance
+    },
+
+    displayDistance(distance: number) {
+      if (distance < 1000) {
+        return `${distance.toFixed(0)} m`
+      }
+
+      return `${(distance / 1000).toFixed(2)} km`
+    },
+
     createPointsLayer(points: Point[]): VectorLayer {
       const pointFeatures = points.map((point: Point) => new Feature(point))
       return new VectorLayer({
