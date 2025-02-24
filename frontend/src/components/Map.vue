@@ -6,11 +6,19 @@
         <div class="time-range" v-if="gpsPoints?.length">
           <div class="row">
             <div class="key">From</div>
-            <div class="value">{{ displayedDate(oldestPoint?.timestamp) }}</div>
+            <div class="value">
+              <a href="#" @click.prevent.stop="onStartDateClick">
+                {{ displayedDate(oldestPoint?.timestamp) }}
+              </a>
+            </div>
           </div>
           <div class="row">
             <div class="key">To</div>
-            <div class="value">{{ displayedDate(newestPoint?.timestamp) }}</div>
+            <div class="value">
+              <a href="#" @click.prevent.stop="onEndDateClick">
+                {{ displayedDate(newestPoint?.timestamp) }}
+              </a>
+            </div>
           </div>
 
           <div class="row">
@@ -189,6 +197,18 @@ export default {
       }
 
       return new Date(date).toString().replace(/GMT.*/, '')
+    },
+
+    onStartDateClick() {
+      this.locationQuery.startDate = this.oldestPoint?.timestamp
+      this.locationQuery.minId = undefined
+      this.locationQuery.maxId = undefined
+    },
+
+    onEndDateClick() {
+      this.locationQuery.endDate = this.newestPoint?.timestamp
+      this.locationQuery.minId = undefined
+      this.locationQuery.maxId = undefined
     },
   },
 
