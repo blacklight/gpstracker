@@ -3,12 +3,12 @@
     <div class="loading" v-if="loading">Loading...</div>
     <div class="map-wrapper" v-else>
       <div id="map">
-        <div class="time-range" v-if="gpsPoints?.length">
+        <div class="time-range" v-if="oldestPoint && newestPoint">
           <div class="row">
             <div class="key">From</div>
             <div class="value">
               <a href="#" @click.prevent.stop="onStartDateClick">
-                {{ displayDate(oldestPoint?.timestamp) }}
+                {{ displayDate(oldestPoint.timestamp) }}
               </a>
             </div>
           </div>
@@ -16,7 +16,7 @@
             <div class="key">To</div>
             <div class="value">
               <a href="#" @click.prevent.stop="onEndDateClick">
-                {{ displayDate(newestPoint?.timestamp) }}
+                {{ displayDate(newestPoint.timestamp) }}
               </a>
             </div>
           </div>
@@ -38,7 +38,7 @@
                         :has-next-page="hasNextPage"
                         :has-prev-page="hasPrevPage"
                         @refresh="locationQuery = $event"
-                        @reset-page="locationQuery.minId = locationQuery.maxId = undefined"
+                        @reset-page="locationQuery.minId = locationQuery.maxId = null"
                         @next-page="fetchNextPage"
                         @prev-page="fetchPrevPage" />
           </div>
@@ -94,7 +94,6 @@ export default {
   data() {
     return {
       loading: false,
-      locationQuery: new LocationQuery({}),
       map: null as Nullable<Map>,
       mappedPoints: [] as Point[],
       mapView: null as Nullable<View>,
@@ -140,16 +139,19 @@ export default {
 
     createMap(gpsPoints: GPSPoint[]): Map {
       this.mappedPoints = this.toMappedPoints(gpsPoints)
-      this.pointsLayer = this.createPointsLayer(this.mappedPoints)
-      this.routesLayer = this.createRoutesLayer(this.mappedPoints)
+      this.pointsLayer = this.createPointsLayer(this.mappedPoints as Point[])
+      this.routesLayer = this.createRoutesLayer(this.mappedPoints as Point[])
       this.mapView = this.mapView || this.createMapView(gpsPoints)
       const map = new Map({
         target: 'map',
         layers: [
           this.createMapLayer(),
+          // @ts-ignore
           this.pointsLayer,
+          // @ts-ignore
           this.routesLayer,
         ],
+        // @ts-ignore
         view: this.mapView,
       })
 
@@ -194,15 +196,15 @@ export default {
     },
 
     onStartDateClick() {
-      this.locationQuery.startDate = this.oldestPoint?.timestamp
-      this.locationQuery.minId = undefined
-      this.locationQuery.maxId = undefined
+      this.locationQuery.startDate = this.oldestPoint?.timestamp || null
+      this.locationQuery.minId = null
+      this.locationQuery.maxId = null
     },
 
     onEndDateClick() {
-      this.locationQuery.endDate = this.newestPoint?.timestamp
-      this.locationQuery.minId = undefined
-      this.locationQuery.maxId = undefined
+      this.locationQuery.endDate = this.newestPoint?.timestamp || null
+      this.locationQuery.minId = null
+      this.locationQuery.maxId = null
     },
   },
 
@@ -215,8 +217,8 @@ export default {
         if (!isFirstQuery &&
           (newQuery.startDate !== oldQuery.startDate || newQuery.endDate !== oldQuery.endDate)
         ) {
-          newQuery.minId = undefined
-          newQuery.maxId = undefined
+          newQuery.minId = null
+          newQuery.maxId = null
           this.hasNextPage = true
           this.hasPrevPage = true
         }
@@ -254,8 +256,11 @@ export default {
 
         this.mappedPoints = this.toMappedPoints(this.gpsPoints)
         if (this.mapView) {
+          // @ts-ignore
           this.refreshMapView(this.mapView, this.gpsPoints)
+          // @ts-ignore
           this.refreshPointsLayer(this.pointsLayer, this.mappedPoints)
+          // @ts-ignore
           this.refreshRoutesLayer(this.routesLayer, this.mappedPoints)
         }
       },

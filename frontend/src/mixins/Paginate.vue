@@ -8,16 +8,17 @@ export default {
       gpsPoints: [] as GPSPoint[],
       hasNextPage: true,
       hasPrevPage: true,
+      locationQuery: new LocationQuery({}),
     }
   },
 
   computed: {
-    newestPoint(): GPSPoint | undefined {
-      return this.gpsPoints[this.gpsPoints.length - 1] || undefined
+    newestPoint(): GPSPoint | null {
+      return this.gpsPoints[this.gpsPoints.length - 1] || null
     },
 
-    oldestPoint(): GPSPoint | undefined {
-      return this.gpsPoints[0] || undefined
+    oldestPoint(): GPSPoint | null {
+      return this.gpsPoints[0] || null
     },
   },
 

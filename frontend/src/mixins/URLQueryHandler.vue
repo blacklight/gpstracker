@@ -11,7 +11,7 @@ function isDate(key: string, value: string): boolean {
   )
 }
 
-function parseValue(key: string, value: string | null): string | number | boolean | Date {
+function parseValue(key: string, value: string | null): string | number | boolean | Date | undefined {
   value = decodeURI(value?.trim() || '')
   if (!value.length) {
     return undefined

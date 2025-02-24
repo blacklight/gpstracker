@@ -27,13 +27,17 @@ export default {
     refreshRoutesLayer(layer: VectorLayer, points: Point[]) {
       const routeFeatures = this.extractRouteFeatures(points)
       const source = layer.getSource()
+      if (!source) {
+        return
+      }
+
       source.clear()
       source.addFeatures(routeFeatures)
       source.changed()
     },
 
     extractRouteFeatures(points: Point[]): Feature[] {
-      const routeFeatures = []
+      const routeFeatures: Feature[] = []
       points.forEach((point: Point, index: number) => {
         if (index === 0) {
           return

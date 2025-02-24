@@ -8,8 +8,8 @@
         <input type="datetime-local"
                id="start-date"
                name="start-date"
-               @input="newFilter.startDate = startPlusHours($event.target.value, 0)"
-               @change="newFilter.startDate = startPlusHours($event.target.value, 0)"
+               @input="newFilter.startDate = startPlusHours($event, 0)"
+               @change="newFilter.startDate = startPlusHours($event, 0)"
                :value="toLocalString(newFilter.startDate)"
                :disabled="disabled"
                :max="maxDate" />
@@ -44,8 +44,8 @@
         <input type="datetime-local"
                id="end-date"
                name="end-date"
-               @input="newFilter.endDate = endPlusHours($event.target.value, 0)"
-               @change="newFilter.endDate = endPlusHours($event.target.value, 0)"
+               @input="newFilter.endDate = endPlusHours($event, 0)"
+               @change="newFilter.endDate = endPlusHours($event, 0)"
                :value="toLocalString(newFilter.endDate)"
                :disabled="disabled"
                :max="maxDate" />
@@ -80,7 +80,7 @@
       <div class="page-button-container">
         <button type="button"
                 :disabled="disabled"
-                v-if="value.minId || value.maxId"
+                v-if="value?.minId || value?.maxId"
                 @click.stop="$emit('reset-page')">
           <font-awesome-icon icon="fas fa-undo" />
         </button>
@@ -99,8 +99,8 @@
         <input type="number"
                id="limit"
                name="limit"
-               @input="newFilter.limit = Number($event.target.value)"
-               @change="newFilter.limit = Number($event.target.value)"
+               @input="setLimit"
+               @change="setLimit"
                :value="newFilter.limit"
                :disabled="disabled"
                min="1" />
@@ -168,8 +168,8 @@ export default {
       return !_.isEqual(
         {
           ...oldValue,
-          startDate: this.normalizeDate(this.value.startDate),
-          endDate: this.normalizeDate(this.value.endDate),
+          startDate: this.normalizeDate(this.value?.startDate),
+          endDate: this.normalizeDate(this.value?.endDate),
         },
         {
           ...newValue,
@@ -179,7 +179,7 @@ export default {
       )
     },
 
-    normalizeDate(date: Date | number | string | null): Date | null {
+    normalizeDate(date: any): Date | null {
       if (!date) {
         return null
       }
@@ -203,7 +203,11 @@ export default {
       ).toISOString().slice(0, -8)
     },
 
-    startPlusHours(date: Date | number | null, hours: number): Date | null {
+    startPlusHours(date: Date | number | Event | undefined | null, hours: number): Date | null {
+      if ((date as any)?.target?.value) {
+        date = (date as any).target.value
+      }
+
       let d = this.normalizeDate(date)
       if (!d) {
         return null
@@ -219,11 +223,15 @@ export default {
       return d
     },
 
-    startPlusDays(date: Date | number | null, days: number): Date | null {
+    startPlusDays(date: Date | number | Event | undefined | null, days: number): Date | null {
       return this.startPlusHours(date, days * 24)
     },
 
-    endPlusHours(date: Date | number | null, hours: number): Date | null {
+    endPlusHours(date: Date | number | Event | undefined | null, hours: number): Date | null {
+      if ((date as any)?.target?.value) {
+        date = (date as any).target.value
+      }
+
       let d = this.normalizeDate(date)
       if (!d) {
         return null
@@ -244,12 +252,16 @@ export default {
       return d
     },
 
-    endPlusDays(date: Date | number | null, days: number): Date | null {
+    endPlusDays(date: Date | number | Event | undefined | null, days: number): Date | null {
       return this.endPlusHours(date, days * 24)
     },
 
     handleSubmit() {
       this.$emit('refresh', this.newFilter)
+    },
+
+    setLimit(event: Event) {
+      this.newFilter.limit = Number((event.target as HTMLInputElement).value)
     },
   },
 

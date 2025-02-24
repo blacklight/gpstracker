@@ -83,6 +83,10 @@ export default {
 
     refreshPointsLayer(layer: VectorLayer, points: Point[]) {
       const source = layer.getSource()
+      if (!source) {
+        return
+      }
+
       source.clear()
       source.addFeatures(points.map((point: Point) => new Feature(point)))
       source.changed()
