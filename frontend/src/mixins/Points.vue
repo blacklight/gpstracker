@@ -9,6 +9,7 @@ import { useGeographic } from 'ol/proj';
 
 import GPSPoint from '../models/GPSPoint';
 import Geo from './Geo.vue';
+import Units from './Units.vue';
 
 const minZoom = 2
 const maxZoom = 18
@@ -16,7 +17,7 @@ const maxZoom = 18
 useGeographic()
 
 export default {
-  mixins: [Geo],
+  mixins: [Geo, Units],
   data() {
     return {
       metersTolerance: 20,
@@ -61,14 +62,6 @@ export default {
       })
 
       return totalDistance
-    },
-
-    displayDistance(distance: number) {
-      if (distance < 1000) {
-        return `${distance.toFixed(0)} m`
-      }
-
-      return `${(distance / 1000).toFixed(2)} km`
     },
 
     createPointsLayer(points: Point[]): VectorLayer {

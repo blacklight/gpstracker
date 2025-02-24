@@ -8,7 +8,7 @@
             <div class="key">From</div>
             <div class="value">
               <a href="#" @click.prevent.stop="onStartDateClick">
-                {{ displayedDate(oldestPoint?.timestamp) }}
+                {{ displayDate(oldestPoint?.timestamp) }}
               </a>
             </div>
           </div>
@@ -16,7 +16,7 @@
             <div class="key">To</div>
             <div class="value">
               <a href="#" @click.prevent.stop="onEndDateClick">
-                {{ displayedDate(newestPoint?.timestamp) }}
+                {{ displayDate(newestPoint?.timestamp) }}
               </a>
             </div>
           </div>
@@ -61,6 +61,7 @@ import { useGeographic } from 'ol/proj';
 
 import type { Nullable } from '../models/Types';
 import Api from '../mixins/Api.vue';
+import Dates from '../mixins/Dates.vue';
 import FilterButton from './filter/ToggleButton.vue';
 import FilterForm from './filter/Form.vue';
 import GPSPoint from '../models/GPSPoint';
@@ -76,6 +77,7 @@ useGeographic()
 export default {
   mixins: [
     Api,
+    Dates,
     MapView,
     Paginate,
     Points,
@@ -189,14 +191,6 @@ export default {
       } else {
         this.locationQuery = new LocationQuery(urlQuery)
       }
-    },
-
-    displayedDate(date: Date | number | string | null): string {
-      if (!date) {
-        return '-'
-      }
-
-      return new Date(date).toString().replace(/GMT.*/, '')
     },
 
     onStartDateClick() {

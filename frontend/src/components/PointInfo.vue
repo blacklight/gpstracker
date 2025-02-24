@@ -22,14 +22,17 @@
 </template>
 
 <script lang="ts">
-import GPSPoint from '../models/GPSPoint';
 import Map from 'ol/Map';
 import Overlay from 'ol/Overlay';
 import type { TCountryCode } from 'countries-list';
 import { getCountryData, getEmojiFlag } from 'countries-list';
 
+import Dates from '../mixins/Dates.vue';
+import GPSPoint from '../models/GPSPoint';
+
 export default {
   emit: ['close'],
+  mixins: [Dates],
   props: {
     point: {
       type: [GPSPoint, null],
@@ -57,7 +60,7 @@ export default {
     },
 
     timeString(): string | null {
-      return this.point?.timestamp ? new Date(this.point.timestamp).toLocaleString() : null
+      return this.displayDate(this.point?.timestamp)
     },
   },
 
