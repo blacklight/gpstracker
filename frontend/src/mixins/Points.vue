@@ -41,8 +41,8 @@ export default {
   data() {
     return {
       metersTolerance: 20,
-      highlightedPointId: null,
-      highlightedFeature: null,
+      highlightedPointId: null as number | null,
+      highlightedFeature: null as Feature | null,
     }
   },
 
@@ -170,8 +170,12 @@ export default {
       })
     },
 
-    highlightPoint(layer: VectorLayer, point: GPSPoint) {
-      const feature = layer.getSource().getClosestFeatureToCoordinate([point.longitude, point.latitude])
+    highlightPoint(layer: VectorLayer | null, point: GPSPoint) {
+      if (!layer) {
+        return
+      }
+
+      const feature = layer.getSource()?.getClosestFeatureToCoordinate([point.longitude, point.latitude])
       if (feature) {
         if (point.id === this.highlightedPointId) {
           return

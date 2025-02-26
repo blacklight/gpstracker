@@ -50,7 +50,7 @@
       <div class="timeline">
         <Timeline :loading="loading"
                   :points="gpsPoints"
-                  @point-hover="highlightPoint(pointsLayer, $event)" />
+                  @point-hover="onTimelinePointHover" />
       </div>
     </div>
   </main>
@@ -226,6 +226,14 @@ export default {
       this.locationQuery.endDate = this.newestPoint?.timestamp || null
       this.locationQuery.minId = null
       this.locationQuery.maxId = null
+    },
+
+    onTimelinePointHover(point: GPSPoint) {
+      if (!this.pointsLayer) {
+        return
+      }
+
+      this.highlightPoint(this.pointsLayer as VectorLayer, point)
     },
   },
 

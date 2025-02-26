@@ -12,6 +12,7 @@
 import {
   CategoryScale,
   Chart as ChartJS,
+  type ChartOptions,
   LineElement,
   LinearScale,
   PointElement,
@@ -68,7 +69,7 @@ export default {
       }
     },
 
-    graphOptions() {
+    graphOptions(): any {
       return {
         responsive: true,
         maintainAspectRatio: false,
