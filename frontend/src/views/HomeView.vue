@@ -13,3 +13,12 @@ export default {
     <Map />
   </main>
 </template>
+
+<style lang="scss">
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+</style>

@@ -16,16 +16,38 @@ const maxZoom = 18
 
 useGeographic()
 
+const pointStyles = {
+  default: new Style({
+    image: new Circle({
+      radius: 6,
+      fill: new Fill({ color: 'aquamarine' }),
+      stroke: new Stroke({ color: 'blue', width: 1 }),
+    }),
+    zIndex: Infinity,  // Ensure that points are always displayed above other layers
+  }),
+
+  highlighted: new Style({
+    image: new Circle({
+      radius: 10,
+      fill: new Fill({ color: 'rgba(255, 0, 0, 0.5)' }),
+      stroke: new Stroke({ color: '#FF0000', width: 2 }),
+    }),
+    zIndex: Infinity,  // Ensure that points are always displayed above other layers
+  }),
+}
+
 export default {
   mixins: [Geo, Units],
   data() {
     return {
       metersTolerance: 20,
+      highlightedPointId: null,
+      highlightedFeature: null,
     }
   },
 
   methods: {
-    groupPoints(points: GPSPoint[]) {
+    groupPoints(points: GPSPoint[]): GPSPoint[] {
       if (!points.length) {
         return []
       }
@@ -93,8 +115,12 @@ export default {
     },
 
     toMappedPoints(gpsPoints: GPSPoint[]): Point[] {
-      return this.groupPoints(gpsPoints).map(
-        (gps: GPSPoint) => new Point([gps.longitude, gps.latitude])
+      return gpsPoints.map(
+        (gps: GPSPoint) => {
+          const point = new Point([gps.longitude, gps.latitude])
+          point.setProperties(gps)
+          return point
+        }
       )
     },
 
@@ -142,6 +168,27 @@ export default {
           target.title = ''
         }
       })
+    },
+
+    highlightPoint(layer: VectorLayer, point: GPSPoint) {
+      const feature = layer.getSource().getClosestFeatureToCoordinate([point.longitude, point.latitude])
+      if (feature) {
+        if (point.id === this.highlightedPointId) {
+          return
+        }
+
+        // Reset the previous highlighted point, if any
+        if (this.highlightedPointId) {
+          const prevFeature = this.highlightedFeature
+          if (prevFeature) {
+            prevFeature.setStyle(pointStyles.default)
+          }
+        }
+
+        feature.setStyle(pointStyles.highlighted)
+        this.highlightedPointId = point.id
+        this.highlightedFeature = feature
+      }
     },
   },
 }

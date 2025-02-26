@@ -1,7 +1,7 @@
 <template>
   <main>
     <div class="loading" v-if="loading">Loading...</div>
-    <div class="map-wrapper" v-else>
+    <div class="map-body" v-else>
       <div id="map">
         <div class="time-range" v-if="oldestPoint && newestPoint">
           <div class="row">
@@ -46,6 +46,12 @@
                         :value="showControls" />
         </div>
       </div>
+
+      <div class="timeline">
+        <Timeline :loading="loading"
+                  :points="gpsPoints"
+                  @point-hover="highlightPoint(pointsLayer, $event)" />
+      </div>
     </div>
   </main>
 </template>
@@ -70,6 +76,7 @@ import MapView from '../mixins/MapView.vue';
 import Paginate from '../mixins/Paginate.vue';
 import Points from '../mixins/Points.vue';
 import Routes from '../mixins/Routes.vue';
+import Timeline from './Timeline.vue';
 import URLQueryHandler from '../mixins/URLQueryHandler.vue';
 
 useGeographic()
@@ -89,13 +96,13 @@ export default {
     FilterButton,
     FilterForm,
     PointInfo,
+    Timeline,
   },
 
   data() {
     return {
       loading: false,
       map: null as Nullable<Map>,
-      mappedPoints: [] as Point[],
       mapView: null as Nullable<View>,
       pointsLayer: null as Nullable<VectorLayer>,
       popup: null as Nullable<Overlay>,
@@ -104,6 +111,21 @@ export default {
       selectedPoint: null as Nullable<GPSPoint>,
       showControls: false,
     }
+  },
+
+  computed: {
+    groupedGPSPoints(): GPSPoint[] {
+      return this.groupPoints(this.gpsPoints)
+    },
+
+    mappedPoints(): Record<string, Point> {
+      return this.toMappedPoints(this.groupedGPSPoints)
+        .reduce((acc: Record<string, Point>, point: Point) => {
+          // @ts-expect-error
+          acc[point.values_.id] = point
+          return acc
+        }, {})
+    },
   },
 
   methods: {
@@ -137,11 +159,10 @@ export default {
       this.locationQuery = prevPageQuery
     },
 
-    createMap(gpsPoints: GPSPoint[]): Map {
-      this.mappedPoints = this.toMappedPoints(gpsPoints)
-      this.pointsLayer = this.createPointsLayer(this.mappedPoints as Point[])
-      this.routesLayer = this.createRoutesLayer(this.mappedPoints as Point[])
-      this.mapView = this.mapView || this.createMapView(gpsPoints)
+    createMap(): Map {
+      this.pointsLayer = this.createPointsLayer(Object.values(this.mappedPoints) as Point[])
+      this.routesLayer = this.createRoutesLayer(Object.values(this.mappedPoints) as Point[])
+      this.mapView = this.mapView || this.createMapView(this.gpsPoints)
       const map = new Map({
         target: 'map',
         layers: [
@@ -254,14 +275,13 @@ export default {
           this.hasPrevPage = gpsPoints.length > 1
         }
 
-        this.mappedPoints = this.toMappedPoints(this.gpsPoints)
         if (this.mapView) {
           // @ts-ignore
           this.refreshMapView(this.mapView, this.gpsPoints)
           // @ts-ignore
-          this.refreshPointsLayer(this.pointsLayer, this.mappedPoints)
+          this.refreshPointsLayer(this.pointsLayer, Object.values(this.mappedPoints))
           // @ts-ignore
-          this.refreshRoutesLayer(this.routesLayer, this.mappedPoints)
+          this.refreshRoutesLayer(this.routesLayer, Object.values(this.mappedPoints))
         }
       },
       deep: true,
@@ -271,7 +291,7 @@ export default {
   async mounted() {
     this.initQuery()
     this.gpsPoints = await this.fetch()
-    this.map = this.createMap(this.gpsPoints)
+    this.map = this.createMap()
   },
 }
 </script>
@@ -280,10 +300,25 @@ export default {
 @use "@/styles/common.scss" as *;
 @import "ol/ol.css";
 
+$timeline-height: 7.5em;
+
 html,
 body {
   margin: 0;
   height: 100%;
+}
+
+main {
+  width: 100%;
+  height: 100%;
+}
+
+.map-body {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 #map {
@@ -291,6 +326,7 @@ body {
   top: 0;
   bottom: 0;
   width: 100%;
+  height: calc(100% - #{$timeline-height});
 
   .controls {
     position: absolute;
@@ -334,6 +370,17 @@ body {
       }
     }
   }
+}
+
+.timeline {
+  width: 100%;
+  height: $timeline-height;
+  position: absolute;
+  bottom: 0;
+  background-color: var(--color-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @keyframes unroll {
