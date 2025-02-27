@@ -50,13 +50,16 @@
       <div class="timeline">
         <Timeline :loading="loading"
                   :points="gpsPoints"
-                  @point-hover="onTimelinePointHover" />
+                  :show-metrics="showMetrics"
+                  @point-hover="onTimelinePointHover"
+                  @show-metrics="setShowMetrics" />
       </div>
     </div>
   </main>
 </template>
 
 <script lang="ts">
+import _ from 'lodash';
 import Map from 'ol/Map';
 import Overlay from 'ol/Overlay';
 import Point from 'ol/geom/Point';
@@ -77,6 +80,7 @@ import Paginate from '../mixins/Paginate.vue';
 import Points from '../mixins/Points.vue';
 import Routes from '../mixins/Routes.vue';
 import Timeline from './Timeline.vue';
+import TimelineMetricsConfiguration from '../models/TimelineMetricsConfiguration';
 import URLQueryHandler from '../mixins/URLQueryHandler.vue';
 
 useGeographic()
@@ -110,6 +114,7 @@ export default {
       routesLayer: null as Nullable<VectorLayer>,
       selectedPoint: null as Nullable<GPSPoint>,
       showControls: false,
+      showMetrics: new TimelineMetricsConfiguration(),
     }
   },
 
@@ -207,13 +212,24 @@ export default {
       })
     },
 
+    refreshShowMetricsFromURL() {
+      this.showMetrics = new TimelineMetricsConfiguration(this.parseQuery(window.location.href))
+    },
+
     initQuery() {
+      this.refreshShowMetricsFromURL()
+
       const urlQuery = this.parseQuery(window.location.href)
-      if (!Object.keys(urlQuery).length) {
-        this.setQuery(this.locationQuery)
-      } else {
+      if (Object.keys(urlQuery).length) {
         this.locationQuery = new LocationQuery(urlQuery)
       }
+
+      this.setQuery(
+        {
+          ...this.locationQuery,
+          ...this.showMetrics.toQuery(),
+        }
+      )
     },
 
     onStartDateClick() {
@@ -235,6 +251,10 @@ export default {
 
       this.highlightPoint(this.pointsLayer as VectorLayer, point)
     },
+
+    setShowMetrics(metrics: any) {
+      Object.assign(this.showMetrics, metrics)
+    },
   },
 
   watch: {
@@ -255,7 +275,13 @@ export default {
         // Results with maxId should be retrieved in descending order,
         // otherwise all results should be retrieved in ascending order
         newQuery.order = newQuery.maxId ? 'desc' : 'asc'
-        this.setQuery(newQuery)
+        this.setQuery(
+          {
+            ...newQuery,
+            ...this.showMetrics.toQuery(),
+          }
+        )
+
         this.queryInitialized = true
 
         if (!isFirstQuery) {
@@ -294,6 +320,16 @@ export default {
       },
       deep: true,
     },
+
+    showMetrics: {
+      handler() {
+        this.setQuery({
+          ...this.locationQuery,
+          ...this.showMetrics.toQuery(),
+        })
+      },
+      deep: true,
+    },
   },
 
   async mounted() {
@@ -308,7 +344,7 @@ export default {
 @use "@/styles/common.scss" as *;
 @import "ol/ol.css";
 
-$timeline-height: 7.5em;
+$timeline-height: 10em;
 
 html,
 body {
@@ -389,6 +425,8 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-top: 0.5em;
+  box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
 }
 
 @keyframes unroll {

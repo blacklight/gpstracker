@@ -15,7 +15,15 @@ export default {
         Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
-      return R * c // in metres
+      const dx = R * c // in metres
+
+      // Take altitude into account if available for both points
+      if (p.altitude && q.altitude) {
+        const dy = p.altitude - q.altitude
+        return Math.sqrt(dx * dx + dy * dy)
+      }
+
+      return dx
     },
   },
 }
