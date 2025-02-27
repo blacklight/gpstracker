@@ -20,7 +20,7 @@
         </p>
         <p class="altitude" v-if="point.altitude">
           <font-awesome-icon icon="fas fa-mountain" />
-          {{ point.altitude }} m
+          {{ Math.round(point.altitude) }} m
         </p>
         <p class="locality" v-if="point.locality">{{ point.locality }}</p>
         <p class="postal-code" v-if="point.postalCode">{{ point.postalCode }}</p>
