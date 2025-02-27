@@ -122,6 +122,7 @@ export default {
             borderColor: '#5959a8',
             fill: false,
             data: this.points.map((point: GPSPoint) => point.altitude),
+            yAxisID: 'meters',
           }
         )
       }
@@ -129,11 +130,11 @@ export default {
       if (this.showMetrics.distance) {
         datasets.push(
           {
-            label: 'Distance (m)',
+            label: 'Distance (' + (this.showMetrics.altitude ? '' : 'k') + 'm)',
             backgroundColor: '#f87979',
             borderColor: '#a85959',
             fill: false,
-            data: this.distances,
+            data: this.showMetrics.altitude ? this.distances : this.distances.map((distance: number) => distance / 1000),
             yAxisID: 'meters',
           }
         )
@@ -171,6 +172,7 @@ export default {
           text.push('Distance')
         }
 
+        const unit = this.showMetrics.altitude ? 'm' : 'km'
         yAxes.meters = {
           type: 'linear',
           position: 'left',
@@ -180,7 +182,7 @@ export default {
           },
           title: {
             display: true,
-            text: text.join(' / ') + ' (m)',
+            text: text.join(' / ') + ` (${unit})`,
           }
         }
       }
