@@ -1,5 +1,7 @@
 # GPSTracker
 
+[![Build Status](https://ci-cd.platypush.tech/api/badges/blacklight/gpstracker/status.svg)](https://ci-cd.platypush.tech/blacklight/gpstracker)
+
 ##### Track your GPS data, from any data source
 
 GPSTracker is a simple Webapp that consists of:
