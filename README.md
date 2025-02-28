@@ -15,6 +15,12 @@ GPSTracker is a simple Webapp that consists of:
 ## Building the application
 
 ```sh
+make
+```
+
+Or, if you want to build the backend and the frontend separately:
+
+```sh
 # Backend
 npm install
 npm run build

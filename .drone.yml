@@ -19,3 +19,12 @@ steps:
 
   commands:
     - . .drone/github-mirror.sh
+
+###
+### Run a smoke test of the application by trying a full build
+###
+
+- name: build
+  image: node:current-alpine3.20
+  commands:
+    - . .drone/build-all.sh
