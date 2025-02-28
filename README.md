@@ -14,6 +14,12 @@ GPSTracker is a simple Webapp that consists of:
 
 ## Building the application
 
+Requirements:
+
+- `node`
+- `typescript`
+- `make`
+
 ```sh
 make
 ```
@@ -22,13 +28,10 @@ Or, if you want to build the backend and the frontend separately:
 
 ```sh
 # Backend
-npm install
-npm run build
+make backend
 
 # Frontend
-cd frontend
-npm install
-npm run build
+make frontend
 ```
 
 ## Configuration
