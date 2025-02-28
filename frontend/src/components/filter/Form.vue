@@ -133,8 +133,8 @@
              name="resolution"
              :value="resolution"
              :disabled="disabled"
-             @input="newResolution = Number($event.target.value)"
-             @change="newResolution = Number($event.target.value)"
+             @input="setResolution"
+             @change="setResolution"
              min="0" />
     </div>
 
@@ -293,6 +293,10 @@ export default {
 
     setLimit(event: Event) {
       this.newFilter.limit = Number((event.target as HTMLInputElement).value)
+    },
+
+    setResolution(event: Event) {
+      this.newResolution = Number((event.target as HTMLInputElement).value)
     },
   },
 
