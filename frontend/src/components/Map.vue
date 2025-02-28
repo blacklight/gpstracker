@@ -37,10 +37,12 @@
                         :disabled="loading"
                         :has-next-page="hasNextPage"
                         :has-prev-page="hasPrevPage"
+                        :resolution="resolutionMeters"
                         @refresh="locationQuery = $event"
                         @reset-page="locationQuery.minId = locationQuery.maxId = null"
                         @next-page="fetchNextPage"
-                        @prev-page="fetchPrevPage" />
+                        @prev-page="fetchPrevPage"
+                        @set-resolution="setResolution" />
           </div>
           <FilterButton @input="showControls = !showControls"
                         :value="showControls" />
@@ -228,6 +230,7 @@ export default {
         {
           ...this.locationQuery,
           ...this.showMetrics.toQuery(),
+          resolutionMeters: this.resolutionMeters,
         }
       )
     },
@@ -250,6 +253,10 @@ export default {
       }
 
       this.highlightPoint(this.pointsLayer as VectorLayer, point)
+    },
+
+    setResolution(resolution: number) {
+      this.resolutionMeters = resolution
     },
 
     setShowMetrics(metrics: any) {
@@ -279,6 +286,7 @@ export default {
           {
             ...newQuery,
             ...this.showMetrics.toQuery(),
+            resolutionMeters: this.resolutionMeters,
           }
         )
 
@@ -321,11 +329,20 @@ export default {
       deep: true,
     },
 
+    resolutionMeters() {
+      this.setQuery({
+        ...this.locationQuery,
+        ...this.showMetrics.toQuery(),
+        resolutionMeters: this.resolutionMeters,
+      })
+    },
+
     showMetrics: {
       handler() {
         this.setQuery({
           ...this.locationQuery,
           ...this.showMetrics.toQuery(),
+          resolutionMeters: this.resolutionMeters,
         })
       },
       deep: true,

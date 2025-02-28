@@ -40,9 +40,9 @@ export default {
   mixins: [Geo, Units],
   data() {
     return {
-      metersTolerance: 20,
       highlightedPointId: null as number | null,
       highlightedFeature: null as Feature | null,
+      resolutionMeters: 50,
     }
   },
 
@@ -57,7 +57,7 @@ export default {
       let prevPoint: GPSPoint = points[0]
 
       points.forEach((point: GPSPoint, index: number) => {
-        if (index === 0 || this.latLngToDistance(point, prevPoint) < this.metersTolerance) {
+        if (index === 0 || this.latLngToDistance(point, prevPoint) < this.resolutionMeters) {
           group.push(point)
         } else {
           if (group.length)

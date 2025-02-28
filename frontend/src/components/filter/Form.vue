@@ -94,6 +94,7 @@
           <font-awesome-icon icon="fas fa-chevron-left" />
         </button>
       </div>
+
       <div class="limit-container">
         <label for="limit">Max Results</label>
         <input type="number"
@@ -116,6 +117,27 @@
       </div>
     </div>
 
+    <div class="resolution-container">
+      <label for="resolution">
+        <p class="title">
+          Resolution (m)
+        </p>
+
+        <p class="help">
+          Adjacent points will be at least this far apart.
+        </p>
+      </label>
+
+      <input type="number"
+             id="resolution"
+             name="resolution"
+             :value="resolution"
+             :disabled="disabled"
+             @input="newResolution = Number($event.target.value)"
+             @change="newResolution = Number($event.target.value)"
+             min="0" />
+    </div>
+
     <div class="footer">
       <button type="submit" :disabled="disabled || !changed">
         <font-awesome-icon icon="fas fa-check" />&nbsp;Apply
@@ -133,6 +155,7 @@ export default {
     'prev-page',
     'reset-page',
     'refresh',
+    'set-resolution',
   ],
   props: {
     value: Object,
@@ -148,6 +171,10 @@ export default {
       type: Boolean,
       default: true,
     },
+    resolution: {
+      type: Number,
+      required: true,
+    },
   },
 
   computed: {
@@ -160,6 +187,7 @@ export default {
     return {
       changed: false,
       newFilter: {...this.value},
+      newResolution: this.resolution,
     }
   },
 
@@ -258,6 +286,9 @@ export default {
 
     handleSubmit() {
       this.$emit('refresh', this.newFilter)
+      if (this.newResolution !== this.resolution) {
+        this.$emit('set-resolution', this.newResolution)
+      }
     },
 
     setLimit(event: Event) {
@@ -281,6 +312,10 @@ export default {
       },
       immediate: true,
       deep: true,
+    },
+
+    newResolution(value) {
+      this.changed = this.changed || value !== this.resolution
     },
   },
 }
@@ -365,8 +400,34 @@ export default {
     }
   }
 
+  .resolution-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0.5em;
+
+    label {
+      margin-bottom: 0.25em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    input {
+      width: 100%;
+    }
+
+    .help {
+      font-size: 0.75em;
+    }
+  }
+
   button[type=submit] {
     min-width: 10em;
+  }
+
+  .help {
+    font-size: 0.75em;
   }
 }
 </style>
