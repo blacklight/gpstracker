@@ -7,8 +7,7 @@ See [main `README`](../README.md) for more information.
 ## Building the frontend
 
 ```sh
-npm install
-npm run build
+make
 ```
 
 ## Configuration

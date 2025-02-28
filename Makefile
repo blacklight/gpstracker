@@ -1,10 +1,9 @@
+.PHONY: all backend frontend
+all: backend frontend
+
 backend:
 	npm install && \
 		npm run build
 
 frontend:
-	cd frontend && \
-		npm install && \
-		npm run build
-
-all: backend frontend
+	cd frontend && make

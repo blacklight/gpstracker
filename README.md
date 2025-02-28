@@ -66,9 +66,3 @@ npm run dev
 cd frontend
 npm run dev
 ```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
