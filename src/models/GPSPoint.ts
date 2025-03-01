@@ -22,4 +22,4 @@ class GPSPoint {
     }
 }
 
-export { GPSPoint };
+export default GPSPoint;

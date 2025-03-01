@@ -1,17 +1,18 @@
-import { Nullable } from './Types';
-import { Db } from '../db/Db';
 import { Op } from 'sequelize';
 
+import { Optional } from 'src/types';
+import { Db } from 'src/db';
+
 class LocationRequest {
-  limit: Nullable<number> = 250;
-  offset: Nullable<number> = null;
-  startDate: Nullable<Date> = null;
-  endDate: Nullable<Date> = null;
-  minId: Nullable<number> = null;
-  maxId: Nullable<number> = null;
-  country: Nullable<string> = null;
-  locality: Nullable<string> = null;
-  postalCode: Nullable<string> = null;
+  limit: Optional<number> = 250;
+  offset: Optional<number> = null;
+  startDate: Optional<Date> = null;
+  endDate: Optional<Date> = null;
+  minId: Optional<number> = null;
+  maxId: Optional<number> = null;
+  country: Optional<string> = null;
+  locality: Optional<string> = null;
+  postalCode: Optional<string> = null;
   orderBy: string = 'timestamp';
   order: string = 'DESC';
 
@@ -99,4 +100,4 @@ class LocationRequest {
   }
 }
 
-export { LocationRequest };
+export default LocationRequest;

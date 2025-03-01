@@ -1,38 +1,58 @@
-import { Sequelize, DataTypes, Dialect } from 'sequelize';
+import { Sequelize, Dialect } from 'sequelize';
 
-export class Db {
+import GPSData from './types/GPSData';
+
+class Db {
   private readonly url: string;
+  private readonly locationUrl: string;
   private readonly locationTable: string;
-  public readonly locationTableColumns: object;
+  public readonly locationTableColumns: Record<string, string>;
   private readonly dialect: Dialect;
-  private readonly sequelize: Sequelize;
+  private readonly locationDialect: Dialect;
+  private readonly appDb: Sequelize;
+  private readonly locationDb: Sequelize;
 
   private static readonly envColumnPrefix = 'DB_LOCATION__';
 
   private constructor(
     opts: {
       url: string,
+      locationUrl: string,
       locationTable: string,
-      locationTableColumns: object,
+      locationTableColumns: Record<string, string>,
       dialect: Dialect,
+      locationDialect: Dialect | null,
     }
   ) {
     this.url = opts.url;
+    this.locationUrl = opts.locationUrl;
     this.locationTable = opts.locationTable;
     this.locationTableColumns = opts.locationTableColumns
     this.dialect = opts.dialect as Dialect;
+    this.locationDialect = (opts.locationDialect || this.dialect) as Dialect;
 
-    this.sequelize = new Sequelize(this.url, {
+    this.appDb = new Sequelize(this.url, {
       dialect: this.dialect,
       logging: process.env.DEBUG === 'true' ? console.log : false
     });
+
+    if (this.locationUrl === this.url) {
+      this.locationDb = this.appDb;
+    } else {
+      this.locationDb = new Sequelize(this.locationUrl, {
+        dialect: this.locationDialect,
+        logging: process.env.DEBUG === 'true' ? console.log : false
+      });
+    }
   }
 
   public static fromEnv(): Db {
     const opts: any = {}
     opts.url = process.env.DB_URL;
+    opts.locationUrl = process.env.DB_LOCATION_URL || opts.url;
     opts.locationTable = process.env.DB_LOCATION_TABLE;
     opts.dialect = process.env.DB_DIALECT || opts.url.split(':')[0];
+    opts.locationDialect = process.env.DB_LOCATION_DIALECT || opts.locationUrl.split(':')[0];
 
     if (!opts.url?.length) {
       console.error('No DB_URL provided');
@@ -77,82 +97,16 @@ export class Db {
     return `${Db.envColumnPrefix}${name.toUpperCase()}`;
   }
 
-  public GpsData() {
-    const typeDef: any = {};
+  /**
+   * Tables
+   */
 
-    // @ts-expect-error
-    typeDef[this.locationTableColumns['id']] = {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    };
-
-    // @ts-expect-error
-    typeDef[this.locationTableColumns['latitude']] = {
-      type: DataTypes.FLOAT,
-      allowNull: false
-    };
-
-    // @ts-expect-error
-    typeDef[this.locationTableColumns['longitude']] = {
-      type: DataTypes.FLOAT,
-      allowNull: false
-    };
-
-    // @ts-expect-error
-    const altitudeCol: string = this.locationTableColumns['altitude'];
-    if (altitudeCol?.length) {
-      typeDef[altitudeCol] = {
-        type: DataTypes.FLOAT,
-        allowNull: true
-      };
-    }
-
-    // @ts-expect-error
-    const addressCol: string = this.locationTableColumns['address'];
-    if (addressCol?.length) {
-      typeDef[addressCol] = {
-        type: DataTypes.STRING,
-        allowNull: true
-      };
-    }
-
-    // @ts-expect-error
-    const localityCol: string = this.locationTableColumns['locality'];
-    if (localityCol?.length) {
-      typeDef[localityCol] = {
-        type: DataTypes.STRING,
-        allowNull: true
-      };
-    }
-
-    // @ts-expect-error
-    const countryCol: string = this.locationTableColumns['country'];
-    if (countryCol?.length) {
-      typeDef[countryCol] = {
-        type: DataTypes.STRING,
-        allowNull: true
-      };
-    }
-
-    // @ts-expect-error
-    const postalCodeCol: string = this.locationTableColumns['postal_code'];
-    if (postalCodeCol?.length) {
-      typeDef[postalCodeCol] = {
-        type: DataTypes.STRING,
-        allowNull: true
-      };
-    }
-
-    // @ts-expect-error
-    typeDef[this.locationTableColumns['timestamp']] = {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
-    };
-
-    return this.sequelize.define('GpsData', typeDef, {
+  public GPSData() {
+    return this.locationDb.define('GPSData', GPSData(this.locationTableColumns), {
       tableName: this.locationTable,
       timestamps: false
     });
   }
 }
+
+export default Db;

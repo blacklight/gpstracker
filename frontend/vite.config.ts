@@ -11,7 +11,7 @@ export default defineConfig((env) => {
   const serverURL = new URL(
     envars.VITE_API_SERVER_URL ?? 'http://localhost:3000'
   );
-  const serverAPIPath = envars.VITE_API_PATH ?? '/api';
+  const serverAPIPath = envars.VITE_API_PATH ?? '/api/v1';
 
   return {
     envDir: envDir,

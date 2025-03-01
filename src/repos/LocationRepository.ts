@@ -1,8 +1,8 @@
-import { Db } from '../db/Db';
-import { GPSPoint } from '../models/GPSPoint';
-import { LocationRequest } from 'src/models/LocationRequest';
+import { Db } from '~/db';
+import { GPSPoint } from '../models';
+import { LocationRequest } from '../requests';
 
-export class LocationRepository {
+class LocationRepository {
   private db: Db;
 
   constructor(db: Db) {
@@ -13,7 +13,7 @@ export class LocationRepository {
     let apiResponse: any[] = [];
 
     try {
-      apiResponse = await this.db.GpsData().findAll(query.toMap(this.db));
+      apiResponse = await this.db.GPSData().findAll(query.toMap(this.db));
     } catch (error) {
       throw new Error(`Error fetching data: ${error}`);
     }
@@ -40,3 +40,5 @@ export class LocationRepository {
     }
   }
 }
+
+export default LocationRepository;
