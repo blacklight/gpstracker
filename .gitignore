@@ -25,3 +25,8 @@ coverage
 *.sw?
 *.vim
 *.tsbuildinfo
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3

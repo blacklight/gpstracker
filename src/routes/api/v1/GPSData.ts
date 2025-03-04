@@ -1,16 +1,15 @@
 import { Request, Response } from 'express';
 
+import { authenticate } from '../../../auth';
 import { LocationRequest } from '../../../requests';
-import LocationRepository from '~/repos/LocationRepository';
 import ApiV1Route from './Route';
-
-const $location: LocationRepository = globalThis.$repos.location;
 
 class GPSData extends ApiV1Route {
   constructor() {
     super('/gpsdata');
   }
 
+  @authenticate()
   get = async (req: Request, res: Response) => {
     let query: LocationRequest
 
@@ -24,7 +23,7 @@ class GPSData extends ApiV1Route {
     }
 
     try {
-      const gpsData = await $location.getHistory(query);
+      const gpsData = await $repos.location.getHistory(query);
       res.json(gpsData);
     } catch (error) {
       const e = `Error fetching data: ${error}`;

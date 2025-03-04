@@ -2,6 +2,7 @@ import { Op } from 'sequelize';
 
 import { Optional } from 'src/types';
 import { Db } from 'src/db';
+import { ValidationError } from '../errors';
 
 class LocationRequest {
   limit: Optional<number> = 250;
@@ -34,7 +35,7 @@ class LocationRequest {
     if (req[key] != null) {
       const numValue = (this as any)[key] = parseInt(req[key]);
       if (isNaN(numValue)) {
-        throw new TypeError(`Invalid value for ${key}: ${req[key]}`);
+        throw new ValidationError(`Invalid value for ${key}: ${req[key]}`);
       }
     }
   }
@@ -44,7 +45,7 @@ class LocationRequest {
       const numValue = (this as any)[key] = parseInt(req[key]);
       const dateValue = (this as any)[key] = new Date(isNaN(numValue) ? req[key] : numValue);
       if (isNaN(dateValue.getTime())) {
-        throw new TypeError(`Invalid value for ${key}: ${req[key]}`);
+        throw new ValidationError(`Invalid value for ${key}: ${req[key]}`);
       }
     }
   }

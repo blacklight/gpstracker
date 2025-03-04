@@ -1,3 +1,11 @@
-type Optional<T> = T | null | undefined;
+import { Request, Response } from 'express';
 
-export { Optional };
+import { AuthInfo } from './auth';
+
+type Optional<T> = T | null | undefined;
+type RequestHandler = (req: Request, res: Response) => Promise<AuthInfo>;
+
+export {
+  Optional,
+  RequestHandler,
+};
