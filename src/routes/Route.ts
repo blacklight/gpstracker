@@ -37,17 +37,23 @@ abstract class Route {
     }
 
     if (error instanceof Forbidden) {
-      res.status(403).send(error.message);
+      res.status(403).json({
+        error: error.message,
+      });
       return;
     }
 
     if (error instanceof NotFound) {
-      res.status(404).send(error.message);
+      res.status(404).json({
+        error: error.message,
+      });
       return;
     }
 
     if (error instanceof BadRequest) {
-      res.status(400).send(error.message);
+      res.status(400).json({
+        error: error.message,
+      });
       return;
     }
 

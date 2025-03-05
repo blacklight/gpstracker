@@ -13,7 +13,10 @@ abstract class ApiRoute extends Route {
   protected static handleError(req: Request, res: Response, error: Error) {
     // Handle API unauthorized errors with a 401+JSON response instead of a redirect
     if (error instanceof Unauthorized) {
-      res.status(401).send(error.message);
+      res.status(401).json({
+        error: error.message,
+      });
+
       return;
     }
 

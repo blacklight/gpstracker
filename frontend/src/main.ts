@@ -1,8 +1,12 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
+import { useStorage } from '@vueuse/core'
+
 import App from './App.vue'
 import router from './router'
+
+import mitt from 'mitt'
 
 /* import the fontawesome core */
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -17,7 +21,16 @@ import { far } from '@fortawesome/free-regular-svg-icons'
 /* add icons to the library */
 library.add(fas, far)
 
+/* set up the storage */
+const storage = useStorage('app-storage', {
+  user: null,
+  userSession: null,
+})
+
 const app = createApp(App)
-  .component('font-awesome-icon', FontAwesomeIcon)
-  .use(router)
-  .mount('#app')
+
+app.component('font-awesome-icon', FontAwesomeIcon)
+app.use(router)
+app.config.globalProperties.$storage = storage
+app.config.globalProperties.$msgBus = mitt()
+app.mount('#app')

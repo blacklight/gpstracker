@@ -329,8 +329,8 @@ export default {
 @use "@/styles/common.scss";
 
 .filter-view {
-  background: var(--color-background);
   height: 100%;
+  background: var(--color-background);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -340,6 +340,18 @@ export default {
   border-radius: 0.5em;
   margin-bottom: 0.25em;
   box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.66);
+
+  @include common.tablet {
+    min-width: 45em;
+  }
+
+  @include common.desktop {
+    min-width: 45em;
+  }
+
+  @include common.mobile {
+    width: 100vw;
+  }
 
   .date-selectors {
     display: flex;

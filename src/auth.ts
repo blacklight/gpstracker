@@ -23,7 +23,7 @@ function authenticate(roles: RoleName[] = []) {
       let session: Optional<UserSession>;
 
       // Check the `session` cookie or the `Authorization` header for the session token
-      let token = req.cookies?.session;
+      let token = req.headers?.cookie?.match(/session=([^;]+)/)?.[1];
       if (!token?.length) {
         const authHeader = req.headers?.authorization;
         if (authHeader?.startsWith('Bearer ')) {

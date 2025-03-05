@@ -62,7 +62,7 @@ class Auth extends ApiV1Route {
    * If the user is authenticated, the session will be destroyed and the cookie will be cleared.
    */
   @authenticate()
-  delete = async (_: Request, res: Response, auth: Optional<AuthInfo>) => {
+  delete = async (_: Request, res: Response, auth?: Optional<AuthInfo>) => {
     const session = auth!.session;
 
     if (session) {

@@ -70,7 +70,7 @@ import VectorLayer from 'ol/layer/Vector';
 import View from 'ol/View';
 import { useGeographic } from 'ol/proj';
 
-import type { Nullable } from '../models/Types';
+import type { Optional } from '../models/Types';
 import Api from '../mixins/Api.vue';
 import Dates from '../mixins/Dates.vue';
 import FilterButton from './filter/ToggleButton.vue';
@@ -108,13 +108,13 @@ export default {
   data() {
     return {
       loading: false,
-      map: null as Nullable<Map>,
-      mapView: null as Nullable<View>,
-      pointsLayer: null as Nullable<VectorLayer>,
-      popup: null as Nullable<Overlay>,
+      map: null as Optional<Map>,
+      mapView: null as Optional<View>,
+      pointsLayer: null as Optional<VectorLayer>,
+      popup: null as Optional<Overlay>,
       queryInitialized: false,
-      routesLayer: null as Nullable<VectorLayer>,
-      selectedPoint: null as Nullable<GPSPoint>,
+      routesLayer: null as Optional<VectorLayer>,
+      selectedPoint: null as Optional<GPSPoint>,
       showControls: false,
       showMetrics: new TimelineMetricsConfiguration(),
     }
@@ -361,13 +361,7 @@ export default {
 @use "@/styles/common.scss" as *;
 @import "ol/ol.css";
 
-$timeline-height: 10em;
-
-html,
-body {
-  margin: 0;
-  height: 100%;
-}
+$timeline-height: 10rem;
 
 main {
   width: 100%;

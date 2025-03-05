@@ -60,6 +60,10 @@
   --vt-c-lime-fg-dark: #27ae60;
   --vt-c-lime-bg-light: #5cb85c;
   --vt-c-lime-bg-dark: #449d44;
+  --vt-c-gray-fg-light: #95a5a6;
+  --vt-c-gray-fg-dark: #7f8c8d;
+  --vt-c-gray-bg-light: #d9edf7;
+  --vt-c-gray-bg-dark: #bce8f1;
 }
 
 /* semantic color variables for this project */
@@ -74,7 +78,13 @@
   --color-heading: var(--vt-c-text-light-1);
   --color-text: var(--vt-c-text-light-1);
   --color-accent: var(--vt-c-blue-fg-light);
+  --color-accent-bg: var(--vt-c-blue-bg-light);
   --color-hover: var(--vt-c-blue-fg-dark);
+
+  --color-error-bg: var(--vt-c-red-bg-light);
+  --color-error-fg: var(--vt-c-gray-fg-light);
+
+  --default-popup-bg: var(--vt-c-green-fg-light);
 
   --section-gap: 160px;
 }
@@ -91,6 +101,12 @@
     --color-heading: var(--vt-c-text-dark-1);
     --color-text: var(--vt-c-text-dark-2);
     --color-accent: var(--vt-c-blue-fg-dark);
+    --color-accent-bg: var(--vt-c-blue-bg-dark);
+
+    --color-error-bg: var(--vt-c-red-bg-dark);
+    --color-error-fg: var(--vt-c-gray-fg-dark);
+
+    --default-popup-bg: var(--vt-c-green-fg-dark);
   }
 }
 
@@ -128,3 +144,4 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
