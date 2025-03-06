@@ -23,7 +23,7 @@ class Db {
     opts: {
       url: string,
       locationUrl: string,
-      locationTable?: string | null,
+      locationTable: string,
       locationTableColumns: Record<string, string>,
       dialect: Dialect,
       locationDialect: Dialect | null,
@@ -36,7 +36,7 @@ class Db {
     this.dialect = opts.dialect as Dialect;
     this.locationDialect = (opts.locationDialect || this.dialect) as Dialect;
     this.tablePrefix = opts.tablePrefix || '';
-    this.locationTable = opts.locationTable || this.tableName('location_history');
+    this.locationTable = opts.locationTable;
 
     this.appDb = new Sequelize(this.url, {
       dialect: this.dialect,
@@ -57,7 +57,7 @@ class Db {
     const opts: any = {}
     opts.url = process.env.DB_URL;
     opts.locationUrl = process.env.DB_LOCATION_URL || opts.url;
-    opts.locationTable = process.env.DB_LOCATION_TABLE;
+    opts.locationTable = process.env.DB_LOCATION_TABLE || 'location_history';
     opts.dialect = process.env.DB_DIALECT || opts.url.split(':')[0];
     opts.locationDialect = process.env.DB_LOCATION_DIALECT || opts.locationUrl.split(':')[0];
     opts.tablePrefix = process.env.DB_TABLE_PREFIX;
