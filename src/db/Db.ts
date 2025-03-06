@@ -112,20 +112,15 @@ class Db {
   public async sync() {
     console.log('Syncing databases');
 
-    const gpsData = this.GPSData();
-    const role = this.Role();
-    const user = this.User();
-    const userRole = this.UserRole();
-    const userSession = this.UserSession();
+    for (const modelName of ['GPSData', 'Role', 'User', 'UserRole', 'UserSession']) {
+      const model = (this as any)[modelName]();
+      process.stdout.write(`  [⌛] Syncing ${model.name}`);
+      await model.sync();
+      await this.appDb.sync();
+      process.stdout.write(`\r  [✅] Synced ${model.name} \n`);
+    }
+
     this.initConstraints();
-
-    await gpsData.sync();
-    await role.sync();
-    await user.sync();
-    await userRole.sync();
-    await userSession.sync();
-
-    await this.appDb.sync();
     console.log('Database sync completed');
   }
 
