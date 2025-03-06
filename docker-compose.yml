@@ -1,0 +1,43 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
+    environment:
+      # Needed to make sure that the backend port can be exposed
+      BACKEND_ADDRESS: 0.0.0.0
+    ports:
+      - 3000:3000
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      # If you change the backend port, remember to also change this URL
+      test: curl -s 'http://localhost:3000' >/dev/null
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      # These should match the settings reported in your DB_URL env variable
+      - POSTGRES_USER=gpstracker
+      - POSTGRES_PASSWORD=gpstracker
+      - POSTGRES_DB=gpstracker
+    volumes:
+      - data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    healthcheck:
+      test: pg_isready -U gpstracker
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  data:

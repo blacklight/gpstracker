@@ -12,7 +12,26 @@ GPSTracker is a simple Webapp that consists of:
   - [[*TODO*]] Can ingest GPS data points from HTTP, MQTT, Websocket or Kafka.
 - A frontend to display GPS data points and provides advanced filtering.
 
-## Building the application
+![Screenshot of GPSTracker](https://static.platypush.tech/screenshots/gpstracker_screenshot.png)
+
+## Configuration
+
+```
+cp .env.example .env
+```
+
+See [the provided `.env.example`](./.env.example) for a reference.
+
+## Docker installation
+
+```sh
+docker compose up
+```
+
+## Local installation
+
+
+### Build
 
 Requirements:
 
@@ -34,23 +53,13 @@ make backend
 make frontend
 ```
 
-## Configuration
-
-See [`.env.example`](./.env.example) for a reference. Copy it to `.env` and modify it accordingly.
-
-## Running the application
-
-### Local installation
+### Run
 
 ```sh
 npm run start
 ```
 
-### Docker
-
-[[*TODO*]]
-
-## Project Setup
+## Development
 
 ### Compile and Hot-Reload for Development
 
