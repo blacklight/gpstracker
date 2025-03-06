@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import Route from '../Route';
 import { Unauthorized, } from '../../errors';
+import { clearCookie } from '../../helpers/cookies';
 
 abstract class ApiRoute extends Route {
   protected version: string;
@@ -13,7 +14,9 @@ abstract class ApiRoute extends Route {
   protected static handleError(req: Request, res: Response, error: Error) {
     // Handle API unauthorized errors with a 401+JSON response instead of a redirect
     if (error instanceof Unauthorized) {
-      res.status(401).json({
+      res.status(401)
+      clearCookie(res, 'session');
+      res.json({
         error: error.message,
       });
 

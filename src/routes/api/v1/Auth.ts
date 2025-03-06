@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import ApiV1Route from './Route';
 import { ValidationError } from '../../../errors';
 import { AuthInfo, authenticate } from '../../../auth';
+import { clearCookie, setCookie } from '../../../helpers/cookies';
 
 class Auth extends ApiV1Route {
   constructor() {
@@ -47,7 +48,12 @@ class Auth extends ApiV1Route {
     }
 
     session = await $repos.userSessions.create(user.id, expiresAtDate);
-    res.setHeader('Set-Cookie', `session=${session.getToken()}; Path=/; HttpOnly; SameSite=Strict`);
+    setCookie(res, {
+      name: 'session',
+      value: session.getToken(),
+      expiresAt: expiresAtDate,
+    });
+
     res.json({
       session: {
         token: session.getToken(),
@@ -69,7 +75,7 @@ class Auth extends ApiV1Route {
       await session.destroy();
     }
 
-    res.setHeader('Set-Cookie', 'session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');
+    clearCookie(res, 'session');
     res.status(204).send();
   }
 }
