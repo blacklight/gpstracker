@@ -54,22 +54,44 @@ class User {
   }
 
   public async setRoles(roles: (Role | RoleName | number | string)[]): Promise<void> {
-    const rolesToFetch = roles.map((role) => {
-      if (role instanceof Role) {
-        return role.id || role.name;
-      }
+    const inputRoleIds = new Set(
+      roles.filter((role) => {
+        role instanceof Role || typeof role === 'number'
+      }).map((role) => {
+        if (role instanceof Role) {
+          return role.id;
+        }
 
-      return role;
-    });
+        return role;
+      })
+    );
+
+    const inputRoleNames = new Set(
+      roles.filter((role) => {
+        typeof role === 'string'
+      }).map((role) => {
+        return role;
+      })
+    );
+
+    if (!inputRoleIds.size && !inputRoleNames.size) {
+      return;  // No roles to set
+    }
+
+    const query: Record<string, any> = {}
+    if (inputRoleIds.size) {
+      query['id'] = [...inputRoleIds];
+    }
+
+    if (inputRoleNames.size) {
+      query['name'] = [...inputRoleNames];
+    }
 
     const roleIds = new Set(
       (
         await $db.Role().findAll({
           where: {
-              [Op.or]: {
-              id: rolesToFetch,
-              name: rolesToFetch,
-            },
+            [Op.or]: query,
           },
         })
       ).map((role) => (role as any).id)
