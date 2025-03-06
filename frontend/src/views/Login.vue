@@ -22,6 +22,13 @@
                v-model="password" />
       </div>
 
+      <div class="row remember">
+        <input type="checkbox"
+               v-model="remember"
+               :disabled="loading" />
+        <label for="remember">Remember me</label>
+      </div>
+
       <div class="row">
         <button type="submit" :disabled="loading">
           <font-awesome-icon icon="sign-in-alt" />
@@ -47,6 +54,7 @@ export default {
       loading: false,
       username: '',
       password: '',
+      remember: false,
     };
   },
 
@@ -63,6 +71,7 @@ export default {
         const sessionToken = await this.login({
           username: this.username,
           password: this.password,
+          expiresAt: this.remember ? new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) : undefined,
         });
 
         if (sessionToken?.length) {
@@ -118,6 +127,18 @@ form {
     justify-content: center;
     width: 100%;
     padding: 0.5em;
+
+    &.remember {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      padding: 0.5em;
+
+      input {
+        margin-right: 0.75em;
+      }
+    }
   }
 }
 </style>
