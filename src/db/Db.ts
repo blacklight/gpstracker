@@ -116,9 +116,8 @@ class Db {
   }
 
   public async sync() {
-    console.log('Syncing databases');
+    console.log('⌛ Syncing database');
     await this.migrations.up();
-    console.log('Database sync completed');
   }
 
   /**
