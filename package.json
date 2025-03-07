@@ -33,6 +33,7 @@
     "pg": "^8.13.3",
     "sequelize": "^6.37.5",
     "sqlite3": "^5.1.7",
+    "umzug": "^3.8.2",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

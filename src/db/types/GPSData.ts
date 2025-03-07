@@ -51,7 +51,7 @@ function GPSData(locationTableColumns: Record<string, string>): Record<string, a
     };
   }
 
-  const postalCodeCol: string = locationTableColumns['postal_code'];
+  const postalCodeCol: string = locationTableColumns['postalCode'];
   if (postalCodeCol?.length) {
     typeDef[postalCodeCol] = {
       type: DataTypes.STRING,

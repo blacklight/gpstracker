@@ -13,7 +13,6 @@ class User {
   public firstName: Optional<string>;
   public lastName: Optional<string>;
   public createdAt: Optional<Date>;
-  public updatedAt: Optional<Date>;
 
   constructor({
     id,
@@ -23,7 +22,6 @@ class User {
     firstName = null,
     lastName = null,
     createdAt = null,
-    updatedAt = null,
   }: User) {
     this.id = id;
     this.username = username;
@@ -32,7 +30,6 @@ class User {
     this.firstName = firstName;
     this.lastName = lastName;
     this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
   }
 
   public static hashPassword(password: string): string {

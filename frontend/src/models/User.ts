@@ -7,7 +7,6 @@ class User {
   public firstName: Optional<string>;
   public lastName: Optional<string>;
   public createdAt: Optional<Date>;
-  public updatedAt: Optional<Date>;
 
   constructor(user: {
     id: number;
@@ -16,7 +15,6 @@ class User {
     firstName?: string;
     lastName?: string;
     createdAt?: Date;
-    updatedAt?: Date;
   }) {
     this.id = user.id;
     this.username = user.username;
@@ -24,7 +22,6 @@ class User {
     this.firstName = user.firstName || null;
     this.lastName = user.lastName || null;
     this.createdAt = user.createdAt || null;
-    this.updatedAt = user.updatedAt || null;
   }
 }
 

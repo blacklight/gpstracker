@@ -1,6 +1,6 @@
 import { DataTypes, } from 'sequelize';
 
-function UserRole(): Record<string, any> {
+function UserDevice(): Record<string, any> {
   return {
     id: {
       type: DataTypes.INTEGER,
@@ -11,8 +11,8 @@ function UserRole(): Record<string, any> {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    roleId: {
-      type: DataTypes.INTEGER,
+    name: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     createdAt: {
@@ -23,4 +23,4 @@ function UserRole(): Record<string, any> {
   };
 }
 
-export default UserRole;
+export default UserDevice;

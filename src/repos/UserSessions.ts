@@ -20,10 +20,14 @@ class UserSessions {
     return session;
   }
 
-  public async create(userId: number, expiresAt: Optional<Date> = null): Promise<UserSession> {
+  public async create(userId: number, args: {
+    expiresAt?: Optional<Date>,
+    name?: Optional<string>,
+  }): Promise<UserSession> {
     const session = await $db.UserSession().create({
       userId,
-      expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
+      name: args.name,
+      expiresAt: args.expiresAt ? new Date(args.expiresAt).toISOString() : null,
     });
 
     return new UserSession(session.dataValues);

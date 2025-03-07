@@ -1,21 +1,25 @@
 import { Sequelize, Dialect } from 'sequelize';
 
+import Migrations from './Migrations';
+
 import GPSData from './types/GPSData';
 import Role from './types/Role';
 import User from './types/User';
+import UserDevice from './types/UserDevice';
 import UserRole from './types/UserRole';
 import UserSession from './types/UserSession';
 
 class Db {
-  private readonly url: string;
-  private readonly locationUrl: string;
-  private readonly locationTable: string;
+  public readonly url: string;
+  public readonly locationUrl: string;
+  public readonly locationTable: string;
   public readonly locationTableColumns: Record<string, string>;
   private readonly dialect: Dialect;
   private readonly locationDialect: Dialect;
   private readonly tablePrefix: string;
   private readonly appDb: Sequelize;
   private readonly locationDb: Sequelize;
+  private readonly migrations: Migrations;
 
   private static readonly envColumnPrefix = 'DB_LOCATION__';
 
@@ -51,6 +55,8 @@ class Db {
         logging: process.env.DEBUG === 'true' ? console.log : false
       });
     }
+
+    this.migrations = new Migrations(this.appDb);
   }
 
   public static fromEnv(): Db {
@@ -87,7 +93,7 @@ class Db {
       'address',
       'locality',
       'country',
-      'postal_code'
+      'postalCode'
     ].reduce((acc: any, name: string) => {
       acc[name] = process.env[this.prefixedEnv(name)];
       if (!acc[name]?.length && requiredColumns[name]) {
@@ -111,49 +117,8 @@ class Db {
 
   public async sync() {
     console.log('Syncing databases');
-
-    for (const modelName of ['GPSData', 'Role', 'User', 'UserRole', 'UserSession']) {
-      const model = (this as any)[modelName]();
-      process.stdout.write(`  [⌛] Syncing ${model.name}`);
-      await model.sync();
-      await this.appDb.sync();
-      process.stdout.write(`\r  [✅] Synced ${model.name} \n`);
-    }
-
-    this.initConstraints();
+    await this.migrations.up();
     console.log('Database sync completed');
-  }
-
-  private initConstraints() {
-    this.appDb.models.UserSession.belongsTo(this.appDb.models.User, {
-      foreignKey: 'userId',
-      targetKey: 'id',
-      as: 'user',
-      onDelete: 'CASCADE'
-    });
-
-    this.appDb.models.User.hasMany(this.appDb.models.UserSession, {
-      foreignKey: 'userId',
-      sourceKey: 'id',
-      as: 'sessions'
-    });
-
-    this.appDb.models.User.belongsToMany(this.appDb.models.Role, {
-      through: this.appDb.models.UserRole,
-      foreignKey: 'userId',
-      otherKey: 'roleId',
-      as: 'roles'
-    });
-
-    this.appDb.models.Role.belongsToMany(this.appDb.models.User, {
-      through: this.appDb.models.UserRole,
-      foreignKey: 'roleId',
-      otherKey: 'userId',
-      as: 'users'
-    });
-
-    this.appDb.models.UserSession.sync();
-    this.appDb.sync();
   }
 
   /**
@@ -176,31 +141,27 @@ class Db {
 
   public User() {
     return this.appDb.define('User', User(), {
-      indexes: [
-        {
-          unique: true,
-          fields: ['username', 'email'],
-        },
-      ],
       tableName: this.tableName('users'),
+      timestamps: false,
+    });
+  }
+
+  public UserDevice() {
+    return this.appDb.define('UserDevice', UserDevice(), {
+      tableName: this.tableName('user_devices'),
       timestamps: false,
     });
   }
 
   public UserRole() {
     return this.appDb.define('UserRole', UserRole(), {
-      tableName: this.tableName('user_roles'),
+      tableName: this.tableName('users_roles'),
       timestamps: false,
     });
   }
 
   public UserSession() {
     const ret = this.appDb.define('UserSession', UserSession(), {
-      indexes: [
-        {
-          fields: ['userId'],
-        },
-      ],
       tableName: this.tableName('user_sessions'),
       timestamps: false,
     });

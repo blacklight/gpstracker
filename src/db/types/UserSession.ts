@@ -22,12 +22,6 @@ function UserSession(): Record<string, any> {
       allowNull: false,
       defaultValue: () => new Date(),
     },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: () => new Date(),
-      onUpdate: () => new Date(),
-    },
   }
 }
 

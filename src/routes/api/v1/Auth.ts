@@ -47,7 +47,11 @@ class Auth extends ApiV1Route {
       }
     }
 
-    session = await $repos.userSessions.create(user.id, expiresAtDate);
+    session = await $repos.userSessions.create(user.id, {
+      name: req.body?.name,
+      expiresAt: expiresAtDate,
+    })
+
     setCookie(res, {
       name: 'session',
       value: session.getToken(),

@@ -1,4 +1,4 @@
-import { DataTypes, } from 'sequelize';
+import { DataTypes } from 'sequelize';
 
 function User(): Record<string, any> {
   return {
@@ -33,12 +33,6 @@ function User(): Record<string, any> {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: () => new Date(),
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: () => new Date(),
-      onUpdate: () => new Date(),
     },
   };
 }

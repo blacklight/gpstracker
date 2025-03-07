@@ -24,7 +24,7 @@ class Location {
           address: data[mappings.address],
           locality: data[mappings.locality],
           country: data[mappings.country],
-          postalCode: data[mappings.postal_code],
+          postalCode: data[mappings.postalCode],
           timestamp: data[mappings.timestamp],
         });
       });

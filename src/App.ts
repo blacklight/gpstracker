@@ -18,8 +18,11 @@ class App {
   }: any) {
     useGlobals();
     $db.sync().then(() => {
-      $repos.userRoles.init();
-      $repos.users.syncAdminUser();
+      $repos.userRoles.init().then(() => {
+        $repos.users.syncAdminUser().then(() => {
+          console.log('  The database is ready');
+        })
+      })
     })
 
     this.app = app;

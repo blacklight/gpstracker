@@ -92,7 +92,7 @@ class LocationRequest {
     }
 
     if (this.postalCode != null) {
-      where[colMapping.postal_code || 'postal_code'] = this.postalCode;
+      where[colMapping.postalCode || 'postalCode'] = this.postalCode;
     }
 
     queryMap.where = where;
