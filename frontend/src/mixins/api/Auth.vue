@@ -11,7 +11,7 @@ export default {
         body: payload
       })
 
-      return response?.session?.token;
+      return response?.token;
     },
 
     async logout(): Promise<any> {

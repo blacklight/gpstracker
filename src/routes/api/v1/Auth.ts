@@ -55,9 +55,7 @@ class Auth extends ApiV1Route {
     });
 
     res.json({
-      session: {
-        token: session.getToken(),
-      }
+      token: session.getToken(),
     });
   }
 
