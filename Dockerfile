@@ -36,6 +36,11 @@ RUN apk add --no-cache typescript make
 # Build all
 RUN make
 
+# Remove dev dependencies
+RUN npm prune --production
+RUN cd frontend && npm prune --production
+RUN apk del make typescript
+
 # Web image
 FROM node:23-alpine AS web
 
