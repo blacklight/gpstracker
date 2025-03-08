@@ -440,15 +440,6 @@ main {
   box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
 }
 
-@keyframes unroll {
-  from {
-    transform: translateY(7.5em);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
 :deep(.ol-viewport) {
   .ol-attribution {
     position: absolute !important;

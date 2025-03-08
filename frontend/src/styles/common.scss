@@ -4,6 +4,8 @@ $screen-sm: 768px;
 $screen-md: 992px;
 $screen-lg: 1200px;
 
+$header-height: 3.5rem;
+
 // @media utilities for common screen sizes
 @mixin mobile {
   @media (max-width: $screen-sm) {
@@ -110,5 +112,14 @@ button {
   }
   to {
     opacity: 0;
+  }
+}
+
+@keyframes unroll {
+  from {
+    transform: translateY(7.5em);
+  }
+  to {
+    transform: translateY(0);
   }
 }

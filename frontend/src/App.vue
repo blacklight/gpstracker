@@ -1,25 +1,6 @@
 <template>
   <div class="app-container">
-    <header v-if="user">
-      <div class="wrapper">
-        <nav>
-          <li class="main">
-            <RouterLink to="/">
-              <font-awesome-icon icon="map-marker-alt" />&nbsp;&nbsp;GPSTracker
-            </RouterLink>
-          </li>
-
-          <div class="spacer" />
-
-          <li class="right">
-            <RouterLink to="/logout">
-              <font-awesome-icon icon="sign-out-alt" />&nbsp;&nbsp;
-              <span class="logout-text">Logout</span>
-            </RouterLink>
-          </li>
-        </nav>
-      </div>
-    </header>
+    <Header :user="user" />
 
     <div class="body">
       <Loading v-if="loading" />
@@ -35,13 +16,19 @@ import { RouterLink, RouterView } from 'vue-router'
 
 import { type Optional } from './models/Types';
 import Api from './mixins/Api.vue';
+import Dropdowns from './mixins/Dropdowns.vue';
+import Header from './components/Header.vue';
 import Loading from './elements/Loading.vue';
 import Messages from './components/Messages.vue'
 import User from './models/User';
 
 export default {
-  mixins: [Api],
+  mixins: [
+    Api,
+    Dropdowns,
+  ],
   components: {
+    Header,
     Loading,
     Messages,
     RouterLink,
@@ -57,6 +44,7 @@ export default {
 
   async mounted() {
     this.loading = true
+    this.installDropdownHandler()
 
     try {
       const auth = await this.fetchUser()
@@ -92,8 +80,6 @@ export default {
 
 <style lang="scss" scoped>
 @use "@/styles/common.scss" as *;
-
-$header-height: 3rem;
 
 .app-container {
   width: 100%;
