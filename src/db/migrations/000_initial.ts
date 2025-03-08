@@ -135,7 +135,9 @@ async function createUsersRolesTable(query: { context: any }) {
       allowNull: false,
       references: {
         model: $db.tableName('users'),
-        key: 'id'
+        key: 'id',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       }
     },
     roleId: {
@@ -143,7 +145,9 @@ async function createUsersRolesTable(query: { context: any }) {
       allowNull: false,
       references: {
         model: $db.tableName('roles'),
-        key: 'id'
+        key: 'id',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       }
     },
     createdAt: {
@@ -167,7 +171,9 @@ async function createUserSessionsTable(query: { context: any }) {
       allowNull: false,
       references: {
         model: $db.tableName('users'),
-        key: 'id'
+        key: 'id',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       }
     },
     name: {
@@ -198,7 +204,9 @@ async function createUserDevicesTable(query: { context: any }) {
       allowNull: false,
       references: {
         model: $db.tableName('users'),
-        key: 'id'
+        key: 'id',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       }
     },
     name: {
