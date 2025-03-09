@@ -5,14 +5,12 @@
     </template>
 
     <form class="confirm-dialog" @submit.prevent="$emit('confirm')">
-      <div class="wrapper">
-        <div class="content">
-          <slot />
-        </div>
-        <div class="buttons">
-          <button type="submit" @click="$emit('confirm')" :disabled="disabled">Confirm</button>
-          <button type="button" @click="$emit('close')" :disabled="disabled">Cancel</button>
-        </div>
+      <div class="content">
+        <slot />
+      </div>
+      <div class="buttons">
+        <button type="submit" @click="$emit('confirm')" :disabled="disabled">Confirm</button>
+        <button type="button" @click="$emit('close')" :disabled="disabled">Cancel</button>
       </div>
     </form>
   </Modal>

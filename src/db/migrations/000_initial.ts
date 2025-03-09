@@ -186,6 +186,11 @@ async function createUserSessionsTable(query: { context: any }) {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    isApi: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     expiresAt: {
       type: DataTypes.DATE,
       allowNull: true,

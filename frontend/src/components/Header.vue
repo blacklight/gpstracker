@@ -26,6 +26,13 @@
             </DropdownItem>
 
             <DropdownItem>
+              <RouterLink to="/api">
+                <font-awesome-icon icon="code" />&nbsp;&nbsp;
+                <span class="item-text">API</span>
+              </RouterLink>
+            </DropdownItem>
+
+            <DropdownItem>
               <RouterLink to="/logout">
                 <font-awesome-icon icon="sign-out-alt" />&nbsp;&nbsp;
                 <span class="item-text">Logout</span>

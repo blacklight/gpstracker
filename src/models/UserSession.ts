@@ -6,6 +6,7 @@ class UserSession {
   public id: string;
   public userId: number;
   public name?: Optional<string>;
+  public isApi: boolean;
   public expiresAt: Optional<Date>;
   public createdAt: Optional<Date>;
 
@@ -13,12 +14,21 @@ class UserSession {
     id,
     userId,
     name,
+    isApi = false,
     expiresAt = null,
     createdAt = null,
-  }: any) {
+  }: {
+    id: string;
+    userId: number;
+    name?: Optional<string>;
+    isApi?: boolean;
+    expiresAt?: Optional<Date>;
+    createdAt?: Optional<Date>;
+  }) {
     this.id = id;
     this.userId = userId;
     this.name = name;
+    this.isApi = isApi;
     this.expiresAt = expiresAt;
     this.createdAt = createdAt;
 

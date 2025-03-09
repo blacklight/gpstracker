@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import API from '../views/API.vue'
 import Devices from '../views/Devices.vue'
 import HomeView from '../views/HomeView.vue'
 import Login from '../views/Login.vue'
@@ -17,6 +18,12 @@ const router = createRouter({
       path: '/devices',
       name: 'devices',
       component: Devices,
+    },
+
+    {
+      path: '/api',
+      name: 'api',
+      component: API,
     },
 
     {

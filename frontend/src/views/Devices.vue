@@ -1,5 +1,5 @@
 <template>
-  <div class="devices">
+  <div class="devices view">
     <div class="wrapper">
       <div class="loading-container" v-if="loading">
         <Loading />
@@ -99,30 +99,4 @@ export default {
 
 <style lang="scss" scoped>
 @use '@/styles/common.scss' as *;
-
-.devices {
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.05);
-  display: flex;
-  justify-content: center;
-  padding: 2em;
-
-  .wrapper {
-    height: 100%;
-    display: flex;
-    background-color: var(--color-background);
-    border-radius: 1em;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-    position: relative;
-
-    @include media(mobile) {
-      width: 100%;
-    }
-
-    @include media(tablet) {
-      min-width: 30em;
-      max-width: 40em;
-    }
-  }
-}
 </style>

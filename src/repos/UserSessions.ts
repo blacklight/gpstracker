@@ -23,10 +23,12 @@ class UserSessions {
   public async create(userId: number, args: {
     expiresAt?: Optional<Date>,
     name?: Optional<string>,
+    isApi?: Optional<boolean>,
   }): Promise<UserSession> {
     const session = await $db.UserSession().create({
       userId,
       name: args.name,
+      isApi: args.isApi || false,
       expiresAt: args.expiresAt ? new Date(args.expiresAt).toISOString() : null,
     });
 
@@ -56,6 +58,19 @@ class UserSessions {
     }
 
     return session;
+  }
+
+  public async byUser(userId: number, { isApi }: { isApi?: boolean } = {}): Promise<UserSession[]> {
+    const filter = { userId } as { userId: number, isApi?: boolean };
+    if (isApi != null) {
+      filter['isApi'] = !!isApi;
+    }
+
+    return (
+      await $db.UserSession().findAll({
+        where: filter,
+      })
+    ).map((session: any) => new UserSession(session.dataValues));
   }
 }
 

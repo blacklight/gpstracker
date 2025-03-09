@@ -13,6 +13,15 @@ function UserSession(): Record<string, any> {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    isApi: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     expiresAt: {
       type: DataTypes.DATE,
       allowNull: true,
