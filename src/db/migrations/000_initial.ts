@@ -207,9 +207,9 @@ async function createUserSessionsTable(query: { context: any }) {
 async function createUserDevicesTable(query: { context: any }) {
   await query.context.createTable($db.tableName('user_devices'), {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true
+      defaultValue: () => uuidv4(),
     },
     userId: {
       type: DataTypes.INTEGER,

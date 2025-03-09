@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import { Optional } from '~/types';
 import Role from './Role';
 import RoleName from './RoleName';
+import UserDevice from './UserDevice';
 
 class User {
   public id: number;
@@ -48,6 +49,16 @@ class User {
         },
       })
     ).map((role) => new Role(role.dataValues));
+  }
+
+  public async devices(): Promise<UserDevice[]> {
+    return (
+      await $db.UserDevice().findAll({
+        where: {
+          userId: this.id,
+        },
+      })
+    ).map((device) => new UserDevice(device.dataValues));
   }
 
   public async setRoles(roles: (Role | RoleName | number | string)[]): Promise<void> {

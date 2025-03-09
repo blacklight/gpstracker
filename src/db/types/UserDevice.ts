@@ -1,11 +1,12 @@
 import { DataTypes, } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
 
 function UserDevice(): Record<string, any> {
   return {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true
+      defaultValue: () => uuidv4(),
     },
     userId: {
       type: DataTypes.INTEGER,

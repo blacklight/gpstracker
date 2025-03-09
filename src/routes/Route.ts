@@ -1,4 +1,5 @@
 import { Express, Request, Response } from 'express';
+import { UniqueConstraintError, ValidationError } from 'sequelize';
 
 import {
   BadRequest,
@@ -50,7 +51,14 @@ abstract class Route {
       return;
     }
 
-    if (error instanceof BadRequest) {
+    if (error instanceof UniqueConstraintError) {
+      res.status(400).json({
+        error: `A record with the same [${Object.values(error.fields).join(', ')}] already exists`,
+      });
+      return;
+    }
+
+    if (error instanceof BadRequest || error instanceof ValidationError) {
       res.status(400).json({
         error: error.message,
       });
@@ -66,17 +74,18 @@ abstract class Route {
     handlerName: string,
   ) => {
     logRequest(req);
-    // @ts-expect-error
-    const handler = (this[handlerName]) as ((req: Request, res: Response, auth: AuthInfo) => Promise<void>);
-    const preRequestHandler = (<typeof Route> this.constructor).preRequestHandlers[handlerName];
 
     try {
+      // @ts-expect-error
+      const handler = (this[handlerName]) as ((req: Request, res: Response, auth: AuthInfo) => Promise<void>);
+      const preRequestHandler = (<typeof Route> this.constructor).preRequestHandlers[handlerName];
+
       let authInfo: Optional<AuthInfo>
       if (preRequestHandler) {
         authInfo = await preRequestHandler(req, res);
       }
 
-      handler(req, res, authInfo!);
+      await handler(req, res, authInfo!);
     } catch (error) {
       (<typeof Route> this.constructor).handleError(req, res, error);
     }

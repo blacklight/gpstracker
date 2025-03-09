@@ -5,17 +5,20 @@ import { Optional } from '~/types';
 class UserSession {
   public id: string;
   public userId: number;
+  public name?: Optional<string>;
   public expiresAt: Optional<Date>;
   public createdAt: Optional<Date>;
 
   constructor({
     id,
     userId,
+    name,
     expiresAt = null,
     createdAt = null,
   }: any) {
     this.id = id;
     this.userId = userId;
+    this.name = name;
     this.expiresAt = expiresAt;
     this.createdAt = createdAt;
 
