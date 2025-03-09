@@ -1,0 +1,17 @@
+@use "sass:map";
+
+// Set screen width breakpoints
+$breakpoints: (
+  mobile : 0px,
+  tablet : 680px,
+  desktop: 960px
+);
+
+// Mixin to print out media queries (based on map keys passed)
+@mixin media($keys...){
+  @each $key in $keys {
+    @media (min-width: map.get($breakpoints, $key)){
+      @content
+    }
+  }
+}
