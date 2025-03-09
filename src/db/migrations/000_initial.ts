@@ -156,6 +156,12 @@ async function createUsersRolesTable(query: { context: any }) {
       defaultValue: () => new Date(),
     },
   });
+
+  // <userId, roleId> must be unique
+  await query.context.addConstraint($db.tableName('users_roles'), {
+    fields: ['userId', 'roleId'],
+    type: 'unique',
+  });
 }
 
 async function createUserSessionsTable(query: { context: any }) {
@@ -190,6 +196,12 @@ async function createUserSessionsTable(query: { context: any }) {
       defaultValue: () => new Date(),
     },
   });
+
+  // <userId, name> must be unique
+  await query.context.addConstraint($db.tableName('user_sessions'), {
+    fields: ['userId', 'name'],
+    type: 'unique',
+  });
 }
 
 async function createUserDevicesTable(query: { context: any }) {
@@ -218,6 +230,12 @@ async function createUserDevicesTable(query: { context: any }) {
       allowNull: false,
       defaultValue: () => new Date(),
     },
+  });
+
+  // <userId, name> must be unique
+  await query.context.addConstraint($db.tableName('user_devices'), {
+    fields: ['userId', 'name'],
+    type: 'unique',
   });
 }
 
