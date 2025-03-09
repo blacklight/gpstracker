@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { Optional } from '../../models/Types';
+import { type Optional } from '../../models/Types';
 import Api from '../../mixins/Api.vue';
 import Loading from '../../elements/Loading.vue';
 import Notifications from '../../mixins/Notifications.vue';
@@ -59,9 +59,15 @@ export default {
     }
   },
 
+  computed: {
+    nameElement() {
+      return this.$refs.name as HTMLInputElement;
+    },
+  },
+
   methods: {
     async sync() {
-      const name = this.$refs.name.value.trim();
+      const name = this.nameElement.value.trim();
       if (!name?.length) {
         this.notify({
           content: 'Please enter a name for your device.',
@@ -92,7 +98,7 @@ export default {
   },
 
   async mounted() {
-    this.$refs.name.focus();
+    this.nameElement.focus();
   },
 }
 </script>

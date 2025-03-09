@@ -25,7 +25,7 @@ export default {
         method: 'PATCH',
         body: Object.keys(device).reduce((acc, key) => {
           if (!['id', 'userId', 'createdAt', 'updatedAt'].includes(key)) {
-            acc[key] = device[key];
+            acc[key] = (device as any)[key];
           }
 
           return acc;
