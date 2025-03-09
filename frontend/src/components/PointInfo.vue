@@ -78,7 +78,7 @@ export default {
     },
 
     timeString(): string | null {
-      return this.displayDate(this.point?.timestamp)
+      return this.formatDate(this.point?.timestamp)
     },
   },
 

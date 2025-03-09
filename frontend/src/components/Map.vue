@@ -8,7 +8,7 @@
             <div class="key">From</div>
             <div class="value">
               <a href="#" @click.prevent.stop="onStartDateClick">
-                {{ displayDate(oldestPoint.timestamp) }}
+                {{ formatDate(oldestPoint.timestamp) }}
               </a>
             </div>
           </div>
@@ -16,7 +16,7 @@
             <div class="key">To</div>
             <div class="value">
               <a href="#" @click.prevent.stop="onEndDateClick">
-                {{ displayDate(newestPoint.timestamp) }}
+                {{ formatDate(newestPoint.timestamp) }}
               </a>
             </div>
           </div>
@@ -392,7 +392,7 @@ main {
     padding: 0.5em;
     z-index: 1;
 
-    @include mobile {
+    @include media(mobile) {
       bottom: 1em;
     }
 
@@ -407,8 +407,9 @@ main {
     top: 0;
     right: 0;
     padding: 0.5em;
-    background-color: rgba(255, 255, 255, 0.8);
+    background: var(--color-background);
     border-radius: 0.25em;
+    opacity: 0.8;
     z-index: 1;
 
     .row {

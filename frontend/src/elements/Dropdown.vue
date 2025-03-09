@@ -4,7 +4,7 @@
       <slot name="button" />
     </button>
 
-    <div class="dropdown__container" ref="container">
+    <div class="dropdown__container" ref="container" @click="hide">
       <div class="dropdown__content">
         <slot />
       </div>
@@ -21,6 +21,10 @@ export default {
   },
 
   methods: {
+    hide() {
+      this.container.classList.remove('show');
+    },
+
     show() {
       this.container.classList.add('show');
     },
@@ -39,6 +43,7 @@ export default {
     background: none;
     border: none;
     cursor: pointer;
+    margin: 0;
 
     &:focus,
     &:hover {

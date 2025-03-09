@@ -32,7 +32,7 @@ export default {
   }
 
   &__icon {
-    margin-right: 0.5rem;
+    margin: 0 0.5rem;
   }
 
   &__text {

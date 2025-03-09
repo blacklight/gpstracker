@@ -3,8 +3,13 @@
     <Header :user="user" />
 
     <div class="body">
-      <Loading v-if="loading" />
-      <RouterView />
+      <div class="loading-container" v-if="loading">
+        <Loading />
+      </div>
+
+      <div class="view-container" v-else>
+        <RouterView />
+      </div>
     </div>
 
     <Messages />
@@ -130,12 +135,6 @@ export default {
         &.right {
           margin-right: 0.5rem;
         }
-
-        .logout-text {
-          @include mobile {
-            display: none;
-          }
-        }
       }
 
       .spacer {
@@ -150,6 +149,24 @@ export default {
     flex: 1;
     overflow-y: auto;
     position: relative;
+  }
+
+  .loading-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .view-container {
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

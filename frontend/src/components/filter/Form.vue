@@ -326,7 +326,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use "@/styles/common.scss";
+@use "@/styles/common.scss" as *;
 
 .filter-view {
   height: 100%;
@@ -341,16 +341,13 @@ export default {
   margin-bottom: 0.25em;
   box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.66);
 
-  @include common.tablet {
-    min-width: 45em;
+  @include media(mobile) {
+    width: calc(100vw - 2em);
   }
 
-  @include common.desktop {
+  @include media(tablet) {
+    width: 100%;
     min-width: 45em;
-  }
-
-  @include common.mobile {
-    width: 100vw;
   }
 
   .date-selectors {
@@ -358,8 +355,12 @@ export default {
     justify-content: space-between;
     width: 100%;
 
-    @include common.mobile {
+    @include media(mobile) {
       flex-direction: column;
+    }
+
+    @include media(tablet) {
+      flex-direction: row;
     }
 
     .date-selector {

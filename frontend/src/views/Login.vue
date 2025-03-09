@@ -105,7 +105,7 @@ main {
   justify-content: center;
   height: 100%;
   width: 100%;
-  background: var(--vt-c-green-bg-light);
+  background: var(--color-accent);
 }
 
 form {

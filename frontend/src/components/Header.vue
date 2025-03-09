@@ -42,8 +42,8 @@
 import { RouterLink } from 'vue-router'
 
 import { type Optional } from '../models/Types';
-import Dropdown from './Dropdown.vue';
-import DropdownItem from './DropdownItem.vue';
+import Dropdown from '../elements/Dropdown.vue';
+import DropdownItem from '../elements/DropdownItem.vue';
 import User from '../models/User';
 
 export default {
@@ -86,6 +86,8 @@ header {
         margin-left: 0.5rem;
 
         :deep(a) {
+          color: var(--color-accent);
+
           &:hover {
             background: none;
             font-size: 1.5rem;
@@ -109,7 +111,7 @@ header {
       }
 
       .logout-text {
-        @include mobile {
+        @include media(mobile) {
           display: none;
         }
       }
