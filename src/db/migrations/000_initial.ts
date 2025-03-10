@@ -1,73 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 
-async function createLocationHistoryTable(query: { context: any }) {
-  // Only create the table if locationUrl == appUrl (i.e. the location is stored
-  // on the app managed database and not on an external one)
-  if ($db.locationUrl !== $db.url) {
-    console.log('The location history table is stored on an external database, skipping creation');
-    return;
-  }
-
-  const typeDef: Record<string, any> = {
-    [$db.locationTableColumns['id']]: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
-    [$db.locationTableColumns['latitude']]: {
-      type: DataTypes.FLOAT,
-      allowNull: false
-    },
-    [$db.locationTableColumns['longitude']]: {
-      type: DataTypes.FLOAT,
-      allowNull: false
-    },
-    [$db.locationTableColumns['timestamp']]: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-      allowNull: false
-    },
-  }
-
-  if ($db.locationTableColumns['altitude']) {
-    typeDef[$db.locationTableColumns['altitude']] = {
-      type: DataTypes.FLOAT,
-      allowNull: true
-    }
-  }
-
-  if ($db.locationTableColumns['address']) {
-    typeDef[$db.locationTableColumns['address']] = {
-      type: DataTypes.STRING,
-      allowNull: true
-    }
-  }
-
-  if ($db.locationTableColumns['locality']) {
-    typeDef[$db.locationTableColumns['locality']] = {
-      type: DataTypes.STRING,
-      allowNull: true
-    }
-  }
-
-  if ($db.locationTableColumns['country']) {
-    typeDef[$db.locationTableColumns['country']] = {
-      type: DataTypes.STRING,
-      allowNull: true
-    }
-  }
-
-  if ($db.locationTableColumns['postalCode']) {
-    typeDef[$db.locationTableColumns['postalCode']] = {
-      type: DataTypes.STRING,
-      allowNull: true
-    }
-  }
-
-  await query.context.createTable($db.locationTable, typeDef);
-}
-
 async function createUsersTable(query: { context: any }) {
   await query.context.createTable($db.tableName('users'), {
     id: {
@@ -133,6 +66,7 @@ async function createUsersRolesTable(query: { context: any }) {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      unique: 'user_role_userId_roleId_unique',
       references: {
         model: $db.tableName('users'),
         key: 'id',
@@ -143,6 +77,7 @@ async function createUsersRolesTable(query: { context: any }) {
     roleId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      unique: 'user_role_userId_roleId_unique',
       references: {
         model: $db.tableName('roles'),
         key: 'id',
@@ -155,12 +90,6 @@ async function createUsersRolesTable(query: { context: any }) {
       allowNull: false,
       defaultValue: () => new Date(),
     },
-  });
-
-  // <userId, roleId> must be unique
-  await query.context.addConstraint($db.tableName('users_roles'), {
-    fields: ['userId', 'roleId'],
-    type: 'unique',
   });
 }
 
@@ -175,6 +104,7 @@ async function createUserSessionsTable(query: { context: any }) {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      unique: 'user_sessions_userId_name_unique',
       references: {
         model: $db.tableName('users'),
         key: 'id',
@@ -185,6 +115,7 @@ async function createUserSessionsTable(query: { context: any }) {
     name: {
       type: DataTypes.STRING,
       allowNull: true,
+      unique: 'user_sessions_userId_name_unique',
     },
     isApi: {
       type: DataTypes.BOOLEAN,
@@ -201,12 +132,6 @@ async function createUserSessionsTable(query: { context: any }) {
       defaultValue: () => new Date(),
     },
   });
-
-  // <userId, name> must be unique
-  await query.context.addConstraint($db.tableName('user_sessions'), {
-    fields: ['userId', 'name'],
-    type: 'unique',
-  });
 }
 
 async function createUserDevicesTable(query: { context: any }) {
@@ -219,6 +144,7 @@ async function createUserDevicesTable(query: { context: any }) {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      unique: 'user_device_userId_name_unique',
       references: {
         model: $db.tableName('users'),
         key: 'id',
@@ -229,6 +155,7 @@ async function createUserDevicesTable(query: { context: any }) {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: 'user_device_userId_name_unique',
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -236,12 +163,67 @@ async function createUserDevicesTable(query: { context: any }) {
       defaultValue: () => new Date(),
     },
   });
+}
 
-  // <userId, name> must be unique
-  await query.context.addConstraint($db.tableName('user_devices'), {
-    fields: ['userId', 'name'],
-    type: 'unique',
-  });
+async function createLocationHistoryTable(query: { context: any }) {
+  // Only create the table if locationUrl == appUrl (i.e. the location is stored
+  // on the app managed database and not on an external one)
+  if ($db.locationUrl !== $db.url) {
+    console.log('The location history table is stored on an external database, skipping creation');
+    return;
+  }
+
+  await query.context.createTable($db.locationTable, {
+    [$db.locationTableColumns['id']]: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
+    [$db.locationTableColumns['deviceId']]: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: $db.tableName('user_devices'),
+        key: 'id',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      },
+    },
+    [$db.locationTableColumns['latitude']]: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
+    [$db.locationTableColumns['longitude']]: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
+    [$db.locationTableColumns['altitude']]: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
+    [$db.locationTableColumns['address']]: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    [$db.locationTableColumns['locality']]: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    [$db.locationTableColumns['country']]: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    [$db.locationTableColumns['postalCode']]: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    [$db.locationTableColumns['timestamp']]: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false
+    },
+  })
 }
 
 async function up(query: { context: any }) {
