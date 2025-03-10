@@ -17,6 +17,16 @@ class UserDevices {
     return new UserDevice(dbDevice.dataValues);
   }
 
+  public async getAll(deviceIds: string[]): Promise<UserDevice[]> {
+    const dbDevices = await $db.UserDevice().findAll({
+      where: {
+        name: deviceIds,
+      }
+    });
+
+    return dbDevices.map((d) => new UserDevice(d.dataValues));
+  }
+
   public async create(name: string, args: {
     userId: number,
   }): Promise<UserDevice> {

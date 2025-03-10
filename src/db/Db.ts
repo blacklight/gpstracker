@@ -86,6 +86,7 @@ class Db {
 
     opts.locationTableColumns = [
       'id',
+      'deviceId',
       'timestamp',
       'latitude',
       'longitude',
@@ -96,7 +97,7 @@ class Db {
       'postalCode'
     ].reduce((acc: any, name: string) => {
       acc[name] = process.env[this.prefixedEnv(name)];
-      if (!acc[name]?.length && requiredColumns[name]) {
+      if (!acc[name]?.length && (requiredColumns[name] || opts.locationUrl === opts.url)) {
         // Default to the name of the required field
         acc[name] = name;
       }

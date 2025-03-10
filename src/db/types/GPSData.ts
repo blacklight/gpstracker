@@ -9,6 +9,13 @@ function GPSData(locationTableColumns: Record<string, string>): Record<string, a
     autoIncrement: true
   };
 
+  const deviceIdCol: string = locationTableColumns['deviceId'];
+  if (deviceIdCol?.length) {
+    typeDef[deviceIdCol] = {
+      type: DataTypes.UUID,
+    };
+  }
+
   typeDef[locationTableColumns['latitude']] = {
     type: DataTypes.FLOAT,
     allowNull: false
