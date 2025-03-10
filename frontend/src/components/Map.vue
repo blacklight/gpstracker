@@ -133,7 +133,7 @@ export default {
       queryInitialized: false,
       refreshPoints: 0,
       routesLayer: null as Optional<VectorLayer>,
-      selectedFeature: null as Optional<Point>,
+      selectedFeature: null as Optional<Feature>,
       selectedPoint: null as Optional<GPSPoint>,
       showControls: false,
       showMetrics: new TimelineMetricsConfiguration(),
@@ -181,7 +181,7 @@ export default {
       try {
         this.deletePoints([this.pointToRemove])
         if (this.selectedFeature) {
-          const routeFeatures = this.routesLayer?.getSource().getFeatures().filter((f: Feature) => {
+          const routeFeatures = this.routesLayer?.getSource()?.getFeatures()?.filter((f: Feature) => {
             const [start, end] = (f.getGeometry() as any).getCoordinates()
             return (
               (
@@ -194,11 +194,11 @@ export default {
             )
           })
 
-          if (routeFeatures.length) {
-            this.routesLayer?.getSource().removeFeatures(routeFeatures)
+          if (routeFeatures?.length) {
+            this.routesLayer?.getSource()?.removeFeatures(routeFeatures)
           }
 
-          this.pointsLayer?.getSource().removeFeature(this.selectedFeature)
+          this.pointsLayer?.getSource()?.removeFeature(this.selectedFeature)
         }
 
         this.gpsPoints = this.gpsPoints.filter((p: GPSPoint) => p.id !== this.pointToRemove?.id)
@@ -213,7 +213,6 @@ export default {
 
     onRemove(point: GPSPoint) {
       this.pointToRemove = point
-      this.$emit('remove', this.point)
     },
 
     fetchNextPage() {
@@ -273,7 +272,7 @@ export default {
         const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => feature)
 
         if (feature) {
-          this.selectedFeature = feature
+          this.selectedFeature = feature as Feature
           const point = this.gpsPoints.find((gps: GPSPoint) => {
             const [longitude, latitude] = (feature.getGeometry() as any).getCoordinates()
             return gps.longitude === longitude && gps.latitude === latitude
