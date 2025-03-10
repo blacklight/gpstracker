@@ -29,6 +29,7 @@
 
         <PointInfo :point="selectedPoint"
                    ref="popup"
+                   @remove="onRemove"
                    @close="selectedPoint = null" />
 
         <div class="controls">
@@ -57,6 +58,19 @@
                   @show-metrics="setShowMetrics" />
       </div>
     </div>
+
+    <ConfirmDialog
+      :visible="true"
+      :disabled="loading"
+      v-if="pointToRemove"
+      @close="pointToRemove = null"
+      @confirm="removePoint">
+      <template #title>
+        Remove point
+      </template>
+
+      Are you sure you want to remove this point?
+    </ConfirmDialog>
   </main>
 </template>
 
@@ -72,7 +86,9 @@ import { useGeographic } from 'ol/proj';
 
 import type { Optional } from '../models/Types';
 import Api from '../mixins/Api.vue';
+import ConfirmDialog from '../elements/ConfirmDialog.vue';
 import Dates from '../mixins/Dates.vue';
+import Feature from 'ol/Feature';
 import FilterButton from './filter/ToggleButton.vue';
 import FilterForm from './filter/Form.vue';
 import GPSPoint from '../models/GPSPoint';
@@ -99,6 +115,7 @@ export default {
   ],
 
   components: {
+    ConfirmDialog,
     FilterButton,
     FilterForm,
     PointInfo,
@@ -110,10 +127,13 @@ export default {
       loading: false,
       map: null as Optional<Map>,
       mapView: null as Optional<View>,
+      pointToRemove: null as Optional<GPSPoint>,
       pointsLayer: null as Optional<VectorLayer>,
       popup: null as Optional<Overlay>,
       queryInitialized: false,
+      refreshPoints: 0,
       routesLayer: null as Optional<VectorLayer>,
+      selectedFeature: null as Optional<Point>,
       selectedPoint: null as Optional<GPSPoint>,
       showControls: false,
       showMetrics: new TimelineMetricsConfiguration(),
@@ -122,10 +142,14 @@ export default {
 
   computed: {
     groupedGPSPoints(): GPSPoint[] {
+      // Reference refreshPoints to force reactivity
+      this.refreshPoints;
       return this.groupPoints(this.gpsPoints)
     },
 
     mappedPoints(): Record<string, Point> {
+      // Reference refreshPoints to force reactivity
+      this.refreshPoints;
       return this.toMappedPoints(this.groupedGPSPoints)
         .reduce((acc: Record<string, Point>, point: Point) => {
           // @ts-expect-error
@@ -146,6 +170,50 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+
+    async removePoint() {
+      if (!this.pointToRemove) {
+        return
+      }
+
+      this.loading = true
+      try {
+        this.deletePoints([this.pointToRemove])
+        if (this.selectedFeature) {
+          const routeFeatures = this.routesLayer?.getSource().getFeatures().filter((f: Feature) => {
+            const [start, end] = (f.getGeometry() as any).getCoordinates()
+            return (
+              (
+                this.pointToRemove?.longitude === start[0] &&
+                this.pointToRemove?.latitude === start[1]
+              ) || (
+                this.pointToRemove?.longitude === end[0] &&
+                this.pointToRemove?.latitude === end[1]
+              )
+            )
+          })
+
+          if (routeFeatures.length) {
+            this.routesLayer?.getSource().removeFeatures(routeFeatures)
+          }
+
+          this.pointsLayer?.getSource().removeFeature(this.selectedFeature)
+        }
+
+        this.gpsPoints = this.gpsPoints.filter((p: GPSPoint) => p.id !== this.pointToRemove?.id)
+        this.refreshPoints++
+      } finally {
+        this.loading = false
+        this.pointToRemove = null
+        this.selectedPoint = null
+        this.selectedFeature = null
+      }
+    },
+
+    onRemove(point: GPSPoint) {
+      this.pointToRemove = point
+      this.$emit('remove', this.point)
     },
 
     fetchNextPage() {
@@ -190,12 +258,22 @@ export default {
       return map
     },
 
+    refreshMap() {
+      // @ts-ignore
+      this.refreshMapView(this.mapView, this.gpsPoints)
+      // @ts-ignore
+      this.refreshPointsLayer(this.pointsLayer, Object.values(this.mappedPoints))
+      // @ts-ignore
+      this.refreshRoutesLayer(this.routesLayer, Object.values(this.mappedPoints))
+    },
+
     bindClick(map: Map) {
       map.on('click', (event) => {
         this.showControls = false
         const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => feature)
 
         if (feature) {
+          this.selectedFeature = feature
           const point = this.gpsPoints.find((gps: GPSPoint) => {
             const [longitude, latitude] = (feature.getGeometry() as any).getCoordinates()
             return gps.longitude === longitude && gps.latitude === latitude
@@ -210,6 +288,7 @@ export default {
           }
         } else {
           this.selectedPoint = null
+          this.selectedFeature = null
         }
       })
     },
@@ -318,12 +397,7 @@ export default {
         }
 
         if (this.mapView) {
-          // @ts-ignore
-          this.refreshMapView(this.mapView, this.gpsPoints)
-          // @ts-ignore
-          this.refreshPointsLayer(this.pointsLayer, Object.values(this.mappedPoints))
-          // @ts-ignore
-          this.refreshRoutesLayer(this.routesLayer, Object.values(this.mappedPoints))
+          this.refreshMap()
         }
       },
       deep: true,

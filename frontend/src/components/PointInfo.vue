@@ -30,6 +30,12 @@
           <span class="continent">{{ country.continent }}</span>
         </p>
         <p class="timestamp" v-if="timeString">{{ timeString }}</p>
+
+        <div class="remove">
+          <button title="Remove" @click="$emit('remove', point)">
+            <font-awesome-icon icon="fas fa-trash-alt" />&nbsp; Remove
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -45,7 +51,7 @@ import Dates from '../mixins/Dates.vue';
 import GPSPoint from '../models/GPSPoint';
 
 export default {
-  emit: ['close'],
+  emit: ['close', 'remove'],
   mixins: [Dates],
   props: {
     point: {
@@ -156,6 +162,23 @@ export default {
     color: var(--color-heading);
     font-weight: bold;
     font-size: 0.9em;
+  }
+
+  .remove {
+    font-size: 0.85em;
+    margin-top: 0.5em;
+
+    button {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--vt-c-red-fg-light);
+      margin-left: -0.5em;
+
+      &:hover {
+        color: var(--vt-c-red-fg-dark);
+      }
+    }
   }
 }
 </style>

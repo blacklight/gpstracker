@@ -20,6 +20,13 @@ export default {
         )
         .sort((a: GPSPoint, b: GPSPoint) => a.timestamp.getTime() - b.timestamp.getTime())
     },
+
+    async deletePoints(points: GPSPoint[]) {
+      await this.request('/gpsdata', {
+        method: 'DELETE',
+        body: points.map((point: GPSPoint) => point.id),
+      })
+    },
   },
 }
 </script>
