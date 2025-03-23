@@ -12,7 +12,7 @@ GPSTracker is a simple Webapp that consists of:
   - [[*TODO*]] Can ingest GPS data points from HTTP, MQTT, Websocket or Kafka.
 - A frontend to display GPS data points and provides advanced filtering.
 
-![Screenshot of GPSTracker](https://static.platypush.tech/screenshots/gpstracker_screenshot.png)
+![Screenshot of GPSTracker](https://static.platypush.tech/screenshots/gpstracker_screenshot.jpg)
 
 ## Configuration
 
