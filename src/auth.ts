@@ -18,7 +18,11 @@ class AuthInfo {
 function authenticate(roles: RoleName[] = []) {
   return function (route: any, method: string) {
     const routeClass = (<typeof Route> route.constructor);
-    routeClass.preRequestHandlers[method] = async (req: Request): Promise<AuthInfo> => {
+    if (!routeClass.preRequestHandlers[routeClass.name]) {
+      routeClass.preRequestHandlers[routeClass.name] = {}
+    }
+
+    routeClass.preRequestHandlers[routeClass.name][method] = async (req: Request): Promise<AuthInfo> => {
       let user: Optional<User>;
       let session: Optional<UserSession>;
 

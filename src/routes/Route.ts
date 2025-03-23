@@ -14,8 +14,8 @@ import { logRequest } from '../helpers/logging';
 
 abstract class Route {
   protected readonly path: string;
-  // Method -> Handler mapping
-  public static preRequestHandlers: Record<string, RequestHandler> = {};
+  // Route -> Method -> Handler mapping
+  public static preRequestHandlers: Record<string, Record<string, RequestHandler>> = {};
 
   constructor(path: string) {
     this.path = path;
@@ -76,9 +76,10 @@ abstract class Route {
     logRequest(req);
 
     try {
+      const routeClass = <typeof Route> this.constructor;
       // @ts-expect-error
       const handler = (this[handlerName]) as ((req: Request, res: Response, auth: AuthInfo) => Promise<void>);
-      const preRequestHandler = (<typeof Route> this.constructor).preRequestHandlers[handlerName];
+      const preRequestHandler = routeClass.preRequestHandlers[routeClass.name]?.[handlerName];
 
       let authInfo: Optional<AuthInfo>
       if (preRequestHandler) {
