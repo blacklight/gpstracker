@@ -89,7 +89,7 @@ export default {
 
   data() {
     return {
-      newValue: null,
+      newValue: {} as GPSPoint,
       editDescription: false,
       popup: null as Overlay | null,
     }
@@ -162,7 +162,7 @@ export default {
     editDescription(edit: boolean) {
       if (edit) {
         this.$nextTick(() => {
-          this.$refs.description?.focus()
+          (this.$refs.description as HTMLTextAreaElement).focus()
         })
       }
     },
