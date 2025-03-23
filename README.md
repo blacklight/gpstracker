@@ -4,6 +4,24 @@
 
 ##### Track your GPS data, from any data source
 
+<!-- toc -->
+
+- [Configuration](#configuration)
+- [Docker installation](#docker-installation)
+- [Local installation](#local-installation)
+  * [Build](#build)
+  * [Run](#run)
+- [Usage](#usage)
+  * [Initial setup](#initial-setup)
+  * [Ingestion](#ingestion)
+  * [External data sources](#external-data-sources)
+- [Development](#development)
+  * [Compile and Hot-Reload for Development](#compile-and-hot-reload-for-development)
+    + [Backend](#backend)
+    + [Frontend](#frontend)
+
+<!-- tocstop -->
+
 GPSTracker is a simple Webapp that consists of:
 
 - A backend that:
