@@ -295,7 +295,7 @@ export default {
           })
 
           if (point) {
-            this.selectedPoint = point
+            this.selectPoint(point)
             // @ts-ignore
             this.$refs.popup.setPosition(event.coordinate)
             // Center the map on the selected point
@@ -307,10 +307,16 @@ export default {
       })
     },
 
+    selectPoint(point: GPSPoint) {
+      this.selectedPoint = point
+      this.highlightPoint(this.pointsLayer as VectorLayer, point)
+    },
+
     clearSelectedPoint() {
       this.selectedPoint = null
       this.selectedPointIndex = null
       this.selectedFeature = null
+      this.removePointHighlight(this.pointsLayer as VectorLayer)
     },
 
     refreshShowMetricsFromURL() {

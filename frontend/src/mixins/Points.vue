@@ -4,7 +4,7 @@ import Map from 'ol/Map';
 import Point from 'ol/geom/Point';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import { Circle, Fill, Style, Stroke } from 'ol/style';
+import { Icon, Style } from 'ol/style';
 import { useGeographic } from 'ol/proj';
 
 import GPSPoint from '../models/GPSPoint';
@@ -13,24 +13,29 @@ import Units from './Units.vue';
 
 const minZoom = 2
 const maxZoom = 18
+const iconSize = 32
 
 useGeographic()
 
 const pointStyles = {
   default: new Style({
-    image: new Circle({
-      radius: 6,
-      fill: new Fill({ color: 'aquamarine' }),
-      stroke: new Stroke({ color: 'blue', width: 1 }),
+    image: new Icon({
+      anchor: [0.5, iconSize - 2],
+      anchorXUnits: 'fraction',
+      anchorYUnits: 'pixels',
+      // TODO Apply favourite accent color
+      src: `/icons/poi.svg?size=${iconSize}&color=3468db&border=1f2d3d&fill=cff0ff`,
     }),
-    zIndex: Infinity,  // Ensure that points are always displayed above other layers
+    zIndex: 100,
   }),
 
   highlighted: new Style({
-    image: new Circle({
-      radius: 10,
-      fill: new Fill({ color: 'rgba(255, 0, 0, 0.5)' }),
-      stroke: new Stroke({ color: '#FF0000', width: 2 }),
+    image: new Icon({
+      anchor: [0.5, iconSize - 2],
+      anchorXUnits: 'fraction',
+      anchorYUnits: 'pixels',
+      src: `/icons/poi.svg?size=${iconSize}&color=dd3300&border=3d2d1f&fill=ffcc00`,
+      scale: 1.3,
     }),
     zIndex: Infinity,  // Ensure that points are always displayed above other layers
   }),
@@ -89,16 +94,9 @@ export default {
     createPointsLayer(points: Point[]): VectorLayer {
       const pointFeatures = points.map((point: Point) => new Feature(point))
       return new VectorLayer({
+        style: pointStyles.default,
         source: new VectorSource({
           features: pointFeatures,
-        }),
-        style: new Style({
-          image: new Circle({
-            radius: 6,
-            fill: new Fill({ color: 'aquamarine' }),
-            stroke: new Stroke({ color: 'blue', width: 1 }),
-          }),
-          zIndex: Infinity,  // Ensure that points are always displayed above other layers
         }),
       })
     },
@@ -192,6 +190,19 @@ export default {
         feature.setStyle(pointStyles.highlighted)
         this.highlightedPointId = point.id
         this.highlightedFeature = feature
+      }
+    },
+
+    removePointHighlight(layer: VectorLayer | null) {
+      if (!layer || !this.highlightedPointId) {
+        return
+      }
+
+      const feature = this.highlightedFeature
+      if (feature) {
+        feature.setStyle(pointStyles.default)
+        this.highlightedPointId = null
+        this.highlightedFeature = null
       }
     },
   },

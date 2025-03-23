@@ -35,9 +35,11 @@ export default defineConfig((env) => {
     server: {
       port: 5173,
       proxy: {
-        // proxy requests with the API path to the server
+        // Proxy requests with the API path to the server
         // <http://localhost:5173/api> -> <http://localhost:3000/api>
         [serverAPIPath]: serverURL.origin,
+        // Proxy requests to /icons/poi.svg to the server
+        '/icons/poi.svg': `${serverURL.origin}`,
       },
     },
   }
