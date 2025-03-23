@@ -218,6 +218,10 @@ async function createLocationHistoryTable(query: { context: any }) {
       type: DataTypes.STRING,
       allowNull: true
     },
+    [$db.locationTableColumns['description']]: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     [$db.locationTableColumns['timestamp']]: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

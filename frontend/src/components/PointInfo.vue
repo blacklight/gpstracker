@@ -22,6 +22,34 @@
           <font-awesome-icon icon="fas fa-mountain" />
           {{ Math.round(point.altitude) }} m
         </p>
+
+        <form class="description editor" @submit.prevent="editPoint" v-if="editDescription">
+          <div class="row">
+            <textarea
+              :value="point.description"
+              @keydown.enter="editPoint"
+              @blur="onDescriptionBlur"
+              ref="description"
+              placeholder="Enter a description" />
+
+            <button type="submit" title="Save">
+              <font-awesome-icon icon="fas fa-save" />
+            </button>
+          </div>
+        </form>
+
+        <p class="description"
+           :class="{ 'no-content': !point.description?.length }"
+           @click="editDescription = true"
+           v-else>
+          <span class="icon">
+            <font-awesome-icon icon="fas fa-edit" />
+          </span>
+          <span class="text">
+            {{ point.description?.length ? point.description : 'No description' }}
+          </span>
+        </p>
+
         <p class="locality" v-if="point.locality">{{ point.locality }}</p>
         <p class="postal-code" v-if="point.postalCode">{{ point.postalCode }}</p>
         <p class="country" v-if="country">
@@ -51,7 +79,7 @@ import Dates from '../mixins/Dates.vue';
 import GPSPoint from '../models/GPSPoint';
 
 export default {
-  emit: ['close', 'remove'],
+  emit: ['close', 'edit', 'remove'],
   mixins: [Dates],
   props: {
     point: {
@@ -61,6 +89,8 @@ export default {
 
   data() {
     return {
+      newValue: null,
+      editDescription: false,
       popup: null as Overlay | null,
     }
   },
@@ -99,9 +129,41 @@ export default {
       map.addOverlay(this.popup)
     },
 
+    editPoint() {
+      this.newValue.description = (this.$refs.description as HTMLTextAreaElement).value
+      this.$emit('edit', this.newValue)
+      this.editDescription = false
+    },
+
+    onDescriptionBlur() {
+      // Give it a moment to allow relevant click events to trigger
+      setTimeout(() => {
+        this.editDescription = false
+      }, 100)
+    },
+
     setPosition(coordinates: number[]) {
       if (this.popup) {
         this.popup.setPosition(coordinates)
+      }
+    },
+  },
+
+  watch: {
+    point: {
+      immediate: true,
+      handler(point: GPSPoint | null) {
+        if (point) {
+          this.newValue = point
+        }
+      },
+    },
+
+    editDescription(edit: boolean) {
+      if (edit) {
+        this.$nextTick(() => {
+          this.$refs.description?.focus()
+        })
       }
     },
   },
@@ -128,7 +190,7 @@ export default {
   .header {
     position: absolute;
     top: 0.5em;
-    right: 0.5em;
+    right: 0;
 
     button {
       background: none;
@@ -156,6 +218,57 @@ export default {
   p.latlng, p.altitude {
     font-size: 0.8em;
     margin: -0.25em 0 0.25em 0;
+  }
+
+  .description {
+    cursor: pointer;
+
+    &:hover {
+      .icon {
+        color: var(--color-accent);
+      }
+    }
+
+    .icon {
+      margin-right: 0.5em;
+    }
+
+    .text {
+      font-style: italic;
+    }
+
+    &:not(.no-content) {
+      .text {
+        font-weight: bold;
+      }
+
+      .icon {
+        color: var(--color-accent);
+      }
+    }
+
+    &.no-content {
+      font-size: 0.9em;
+      opacity: 0.5;
+    }
+
+    textarea {
+      min-height: 5em;
+    }
+
+    button {
+      background: var(--color-accent);
+      border: none;
+      color: var(--color-accent);
+      font-size: 0.9em;
+      margin: 0;
+      padding: 0.5em 1.5em;
+      cursor: pointer;
+
+      &:hover {
+        color: var(--color-heading);
+      }
+    }
   }
 
   .timestamp {

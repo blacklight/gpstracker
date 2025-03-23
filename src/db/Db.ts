@@ -94,7 +94,8 @@ class Db {
       'address',
       'locality',
       'country',
-      'postalCode'
+      'postalCode',
+      'description',
     ].reduce((acc: any, name: string) => {
       acc[name] = process.env[this.prefixedEnv(name)];
       if (!acc[name]?.length && (requiredColumns[name] || opts.locationUrl === opts.url)) {

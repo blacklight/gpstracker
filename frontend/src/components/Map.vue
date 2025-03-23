@@ -30,7 +30,8 @@
         <PointInfo :point="selectedPoint"
                    ref="popup"
                    @remove="onRemove"
-                   @close="selectedPoint = null" />
+                   @edit="editPoint"
+                   @close="clearSelectedPoint" />
 
         <div class="controls">
           <div class="form-container" v-if="showControls">
@@ -135,6 +136,7 @@ export default {
       routesLayer: null as Optional<VectorLayer>,
       selectedFeature: null as Optional<Feature>,
       selectedPoint: null as Optional<GPSPoint>,
+      selectedPointIndex: null as Optional<number>,
       showControls: false,
       showMetrics: new TimelineMetricsConfiguration(),
     }
@@ -206,9 +208,18 @@ export default {
       } finally {
         this.loading = false
         this.pointToRemove = null
-        this.selectedPoint = null
-        this.selectedFeature = null
+        this.clearSelectedPoint()
       }
+    },
+
+    async editPoint(value: GPSPoint) {
+      const index = this.selectedPointIndex
+      if (index === null) {
+        return
+      }
+
+      await this.updatePoints([value])
+      this.gpsPoints[index] = value
     },
 
     onRemove(point: GPSPoint) {
@@ -273,9 +284,14 @@ export default {
 
         if (feature) {
           this.selectedFeature = feature as Feature
-          const point = this.gpsPoints.find((gps: GPSPoint) => {
+          const point = this.gpsPoints.find((gps: GPSPoint, index: number) => {
             const [longitude, latitude] = (feature.getGeometry() as any).getCoordinates()
-            return gps.longitude === longitude && gps.latitude === latitude
+            if (gps.longitude === longitude && gps.latitude === latitude) {
+              this.selectedPointIndex = index
+              return true
+            }
+
+            return false
           })
 
           if (point) {
@@ -286,10 +302,15 @@ export default {
             map.getView().setCenter(event.coordinate)
           }
         } else {
-          this.selectedPoint = null
-          this.selectedFeature = null
+          this.clearSelectedPoint()
         }
       })
+    },
+
+    clearSelectedPoint() {
+      this.selectedPoint = null
+      this.selectedPointIndex = null
+      this.selectedFeature = null
     },
 
     refreshShowMetricsFromURL() {

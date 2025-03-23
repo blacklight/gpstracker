@@ -66,6 +66,14 @@ function GPSData(locationTableColumns: Record<string, string>): Record<string, a
     };
   }
 
+  const descriptionCol: string = locationTableColumns['description'];
+  if (descriptionCol?.length) {
+    typeDef[descriptionCol] = {
+      type: DataTypes.STRING,
+      allowNull: true
+    };
+  }
+
   typeDef[locationTableColumns['timestamp']] = {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

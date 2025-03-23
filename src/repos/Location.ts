@@ -26,6 +26,7 @@ class Location {
           locality: data[mappings.locality],
           country: data[mappings.country],
           postalCode: data[mappings.postalCode],
+          description: data[mappings.description],
           timestamp: data[mappings.timestamp],
         });
       });
@@ -62,6 +63,7 @@ class Location {
           locality: data[mappings.locality],
           country: data[mappings.country],
           postalCode: data[mappings.postalCode],
+          description: data[mappings.description],
           timestamp: data[mappings.timestamp],
         });
       });
@@ -94,6 +96,7 @@ class Location {
               [mappings.locality]: p.locality,
               [mappings.country]: p.country,
               [mappings.postalCode]: p.postalcode,
+              [mappings.description]: p.description,
               [mappings.timestamp]: p.timestamp
             }
           },
@@ -111,11 +114,47 @@ class Location {
           locality: data[mappings.locality],
           country: data[mappings.country],
           postalCode: data[mappings.postalCode],
+          description: data[mappings.description],
           timestamp: data[mappings.timestamp],
         });
       });
     } catch (error) {
       throw new Error(`Error saving data: ${error}`);
+    }
+  }
+
+  public async updatePoints(points: GPSPoint[]): Promise<void> {
+    const mappings: any = $db.locationTableColumns;
+    // Lowercase the keys of the mappings object -
+    // some databases are case-insensitive and this will help with consistency
+    const normalizedPoints = points.map((p) =>
+      Object.entries(p).reduce((acc, [key, value]) => {
+        acc[key.toLowerCase()] = value;
+        return acc;
+      } , {} as Record<string, any>)
+    );
+
+    try {
+      await $db.GPSData().bulkCreate(
+        normalizedPoints.map((p) => {
+          return {
+            [mappings.id]: p.id,
+            [mappings.deviceId]: p.deviceid,
+            [mappings.latitude]: p.latitude,
+            [mappings.longitude]: p.longitude,
+            [mappings.altitude]: p.altitude,
+            [mappings.address]: p.address,
+            [mappings.locality]: p.locality,
+            [mappings.country]: p.country,
+            [mappings.postalCode]: p.postalcode,
+            [mappings.description]: p.description,
+            [mappings.timestamp]: p.timestamp
+          }
+        }),
+        { updateOnDuplicate: Object.keys(mappings) }
+      );
+    } catch (error) {
+      throw new Error(`Error updating data: ${error}`);
     }
   }
 

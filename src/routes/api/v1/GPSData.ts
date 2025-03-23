@@ -4,7 +4,7 @@ import { authenticate } from '../../../auth';
 import { AuthInfo } from '../../../auth';
 import { LocationRequest } from '../../../requests';
 import { Optional } from '../../../types';
-import { RoleName } from '../../../models';
+import { GPSPoint, RoleName } from '../../../models';
 import ApiV1Route from './Route';
 
 class GPSData extends ApiV1Route {
@@ -46,6 +46,20 @@ class GPSData extends ApiV1Route {
     this.validateOwnership(deviceIds, auth!);
     await $repos.location.createPoints(req.body);
     res.status(201).send();
+  }
+
+  @authenticate()
+  patch = async (req: Request, res: Response, auth: Optional<AuthInfo>) => {
+    const points = (req.body as GPSPoint[]).map((p) => {
+      const descr = p.description?.trim()
+      p.description = descr?.length ? descr : null;
+      return p;
+    });
+
+    const deviceIds = points.map((p: any) => p.deviceId).filter((d: any) => !!d);
+    this.validateOwnership(deviceIds, auth!);
+    await $repos.location.updatePoints(points);
+    res.status(204).send();
   }
 
   @authenticate()

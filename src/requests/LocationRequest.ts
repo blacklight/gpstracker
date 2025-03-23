@@ -14,6 +14,7 @@ class LocationRequest {
   country: Optional<string> = null;
   locality: Optional<string> = null;
   postalCode: Optional<string> = null;
+  description: Optional<string> = null;
   orderBy: string = 'timestamp';
   order: string = 'DESC';
 
@@ -27,6 +28,7 @@ class LocationRequest {
     this.country = req.country;
     this.locality = req.locality;
     this.postalCode = req.postalCode;
+    this.description = req.description;
     this.orderBy = req.orderBy || this.orderBy;
     this.order = req.order || this.order;
   }
@@ -93,6 +95,10 @@ class LocationRequest {
 
     if (this.postalCode != null) {
       where[colMapping.postalCode || 'postalCode'] = this.postalCode;
+    }
+
+    if (this.description != null) {
+      where[colMapping.description || 'description'] = {[Op.like]: `%${this.description}%`};
     }
 
     queryMap.where = where;

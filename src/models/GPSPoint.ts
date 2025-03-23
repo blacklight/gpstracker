@@ -8,6 +8,7 @@ class GPSPoint {
   public locality: string | null;
   public country: string | null;
   public postalCode: string | null;
+  public description: string | null;
   public timestamp: Date;
 
   constructor(record: any) {
@@ -20,6 +21,7 @@ class GPSPoint {
     this.locality = record.locality;
     this.country = record.country;
     this.postalCode = record.postalCode;
+    this.description = record.description;
     this.timestamp = record.timestamp;
   }
 }
