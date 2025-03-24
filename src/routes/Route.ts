@@ -27,6 +27,7 @@ abstract class Route {
 
   protected static ServerError(req: Request, res: Response, error: Error) {
     console.error(`Unhandled error in ${req.method} ${req.path}: ${error}`);
+    console.error(error.stack);
     res.status(500).send('Internal Server Error');
   }
 
