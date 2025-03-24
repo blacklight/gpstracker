@@ -127,47 +127,83 @@ class Db {
    */
 
   public GPSData() {
-    return this.locationDb.define('GPSData', GPSData(this.locationTableColumns), {
+    const tableDef = this.locationDb.define('GPSData', GPSData(this.locationTableColumns), {
       tableName: this.locationTable,
       timestamps: false,
     });
+
+    tableDef.hasOne(this.UserDevice(), {
+      sourceKey: this.locationTableColumns.deviceId,
+      foreignKey: 'id',
+      as: 'device',
+    });
+
+    return tableDef;
   }
 
   public Role() {
-    return this.appDb.define('Role', Role(), {
+    const tableDef = this.appDb.define('Role', Role(), {
       tableName: this.tableName('roles'),
       timestamps: false,
     });
+
+    return tableDef;
   }
 
   public User() {
-    return this.appDb.define('User', User(), {
+    const tableDef = this.appDb.define('User', User(), {
       tableName: this.tableName('users'),
       timestamps: false,
     });
+
+    return tableDef;
   }
 
   public UserDevice() {
-    return this.appDb.define('UserDevice', UserDevice(), {
+    const tableDef = this.appDb.define('UserDevice', UserDevice(), {
       tableName: this.tableName('user_devices'),
       timestamps: false,
     });
+
+    tableDef.belongsTo(this.User(), {
+      foreignKey: 'userId',
+      as: 'user',
+    });
+
+    return tableDef;
   }
 
   public UserRole() {
-    return this.appDb.define('UserRole', UserRole(), {
+    const tableDef = this.appDb.define('UserRole', UserRole(), {
       tableName: this.tableName('users_roles'),
       timestamps: false,
     });
+
+    tableDef.belongsTo(this.User(), {
+      foreignKey: 'userId',
+      as: 'user',
+    });
+
+    tableDef.belongsTo(this.Role(), {
+      foreignKey: 'roleId',
+      as: 'role',
+    });
+
+    return tableDef;
   }
 
   public UserSession() {
-    const ret = this.appDb.define('UserSession', UserSession(), {
+    const tableDef = this.appDb.define('UserSession', UserSession(), {
       tableName: this.tableName('user_sessions'),
       timestamps: false,
     });
 
-    return ret;
+    tableDef.belongsTo(this.User(), {
+      foreignKey: 'userId',
+      as: 'user',
+    });
+
+    return tableDef;
   }
 }
 
