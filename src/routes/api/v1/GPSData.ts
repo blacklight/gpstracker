@@ -23,12 +23,12 @@ class GPSData extends ApiV1Route {
   };
 
   @authenticate()
-  get = async (req: Request, res: Response) => {
+  get = async (req: Request, res: Response, auth: Optional<AuthInfo>) => {
     let query: LocationRequest
 
     try {
-      // TODO Limit to the points that the user has access to
       query = new LocationRequest(req.query);
+      query.userId = auth!!.user.id;
     } catch (error) {
       const e = `Error parsing query: ${error}`;
       console.warn(e);

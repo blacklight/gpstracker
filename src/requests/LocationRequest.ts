@@ -4,7 +4,11 @@ import { Optional } from 'src/types';
 import { Db } from 'src/db';
 import { ValidationError } from '../errors';
 
+type Order = 'ASC' | 'DESC';
+
 class LocationRequest {
+  userId: Optional<number> = null;
+  deviceId: Optional<string> = null;
   limit: Optional<number> = 250;
   offset: Optional<number> = null;
   startDate: Optional<Date> = null;
@@ -16,9 +20,26 @@ class LocationRequest {
   postalCode: Optional<string> = null;
   description: Optional<string> = null;
   orderBy: string = 'timestamp';
-  order: string = 'DESC';
+  order: Order = 'DESC';
 
-  constructor(req: any) {
+  constructor(req: {
+    userId?: number;
+    deviceId?: string;
+    limit?: number;
+    offset?: number;
+    startDate?: Date;
+    endDate?: Date;
+    minId?: number;
+    maxId?: number;
+    country?: string;
+    locality?: string;
+    postalCode?: string;
+    description?: string;
+    orderBy?: string;
+    order?: string;
+  }) {
+    this.userId = req.userId;
+    this.deviceId = req.deviceId;
     this.initNumber('limit', req);
     this.initNumber('offset', req);
     this.initDate('startDate', req);
@@ -30,7 +51,7 @@ class LocationRequest {
     this.postalCode = req.postalCode;
     this.description = req.description;
     this.orderBy = req.orderBy || this.orderBy;
-    this.order = req.order || this.order;
+    this.order = (req.order || this.order).toUpperCase() as Order;
   }
 
   private initNumber(key: string, req: any): void {

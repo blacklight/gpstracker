@@ -4,9 +4,23 @@ import { LocationRequest } from '../requests';
 class Location {
   public async getHistory(query: LocationRequest): Promise<GPSPoint[]> {
     let apiResponse: any[] = [];
+    let dbQuery: any = query.toMap($db);
+
+    if (query.userId) {
+      dbQuery.include = [
+        {
+          model: $db.UserDevice(),
+          as: 'device',
+          required: true,
+          where: {
+            userId: query.userId
+          }
+        }
+      ];
+    }
 
     try {
-      apiResponse = await $db.GPSData().findAll(query.toMap($db));
+      apiResponse = await $db.GPSData().findAll(dbQuery);
     } catch (error) {
       throw new Error(`Error fetching data: ${error}`);
     }
