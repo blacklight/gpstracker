@@ -32,11 +32,9 @@
               </RouterLink>
             </DropdownItem>
 
-            <DropdownItem>
-              <RouterLink to="/logout">
-                <font-awesome-icon icon="sign-out-alt" />&nbsp;&nbsp;
-                <span class="item-text">Logout</span>
-              </RouterLink>
+            <DropdownItem @click="$emit('logout')">
+              <font-awesome-icon icon="sign-out-alt" />&nbsp;&nbsp;
+              <span class="item-text">Logout</span>
             </DropdownItem>
           </Dropdown>
         </li>
@@ -54,6 +52,7 @@ import DropdownItem from '../elements/DropdownItem.vue';
 import User from '../models/User';
 
 export default {
+  emits: ['logout'],
   components: {
     Dropdown,
     DropdownItem,

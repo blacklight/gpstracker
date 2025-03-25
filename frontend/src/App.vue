@@ -1,6 +1,7 @@
 <template>
-  <div class="app-container">
-    <Header :user="user" />
+  <Login v-if="!user && !loading" />
+  <div class="app-container" v-else>
+    <Header :user="user" @logout="doLogout" v-if="user" />
 
     <div class="body">
       <div class="loading-container" v-if="loading">
@@ -24,6 +25,7 @@ import Api from './mixins/Api.vue';
 import Dropdowns from './mixins/Dropdowns.vue';
 import Header from './components/Header.vue';
 import Loading from './elements/Loading.vue';
+import Login from './views/Login.vue';
 import Messages from './components/Messages.vue'
 import User from './models/User';
 
@@ -35,6 +37,7 @@ export default {
   components: {
     Header,
     Loading,
+    Login,
     Messages,
     RouterLink,
     RouterView,
@@ -45,6 +48,13 @@ export default {
       loading: false,
       user: null as Optional<User>,
     }
+  },
+
+  methods: {
+    async doLogout() {
+      await this.logout()
+      this.user = null
+    },
   },
 
   async mounted() {
