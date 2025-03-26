@@ -558,9 +558,15 @@ main {
 
 :deep(.ol-viewport) {
   .ol-attribution {
-    position: absolute !important;
-    bottom: 0 !important;
-    right: 0 !important;
+    display: none;
+  }
+
+  .ol-control {
+    margin-bottom: 0.5em;
+  }
+
+  button {
+    background: var(--color-background);
   }
 }
 </style>
