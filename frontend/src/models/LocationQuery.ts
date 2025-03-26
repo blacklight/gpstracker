@@ -1,6 +1,7 @@
 class LocationQuery {
   public limit: number = 250;
   public offset: number | null = null;
+  public deviceId: string | null = null;
   public startDate: Date | null = null;
   public endDate: Date | null = null;
   public minId: number | null = null;
@@ -10,9 +11,22 @@ class LocationQuery {
   public postalCode: string | null = null;
   public order: string = 'asc';
 
-  constructor(public data: any) {
+  constructor(data: {
+    limit?: number;
+    offset?: number;
+    deviceId?: string;
+    startDate?: Date;
+    endDate?: Date;
+    minId?: number;
+    maxId?: number;
+    country?: string;
+    locality?: string;
+    postalCode?: string;
+    order?: string;
+  }) {
     this.limit = data.limit || this.limit;
     this.offset = data.offset || this.offset;
+    this.deviceId = data.deviceId || this.deviceId;
     this.startDate = data.startDate || this.startDate;
     this.endDate = data.endDate || this.endDate;
     this.minId = data.minId || this.minId;

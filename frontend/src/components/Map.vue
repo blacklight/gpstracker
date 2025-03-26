@@ -28,6 +28,7 @@
         </div>
 
         <PointInfo :point="selectedPoint"
+                   :device="devicesById[selectedPoint?.deviceId]"
                    ref="popup"
                    @remove="onRemove"
                    @edit="editPoint"
@@ -36,6 +37,7 @@
         <div class="controls">
           <div class="form-container" v-if="showControls">
             <FilterForm :value="locationQuery"
+                        :devices="devices"
                         :disabled="loading"
                         :has-next-page="hasNextPage"
                         :has-prev-page="hasPrevPage"
@@ -101,6 +103,7 @@ import Routes from '../mixins/Routes.vue';
 import Timeline from './Timeline.vue';
 import TimelineMetricsConfiguration from '../models/TimelineMetricsConfiguration';
 import URLQueryHandler from '../mixins/URLQueryHandler.vue';
+import UserDevice from '../models/UserDevice';
 
 useGeographic()
 
@@ -125,6 +128,7 @@ export default {
 
   data() {
     return {
+      devices: [] as UserDevice[],
       loading: false,
       map: null as Optional<Map>,
       mapView: null as Optional<View>,
@@ -143,6 +147,13 @@ export default {
   },
 
   computed: {
+    devicesById(): Record<string, string> {
+      return this.devices.reduce((acc: Record<string, string>, device: any) => {
+        acc[device.id] = device
+        return acc
+      }, {})
+    },
+
     groupedGPSPoints(): GPSPoint[] {
       // Reference refreshPoints to force reactivity
       this.refreshPoints;
@@ -450,8 +461,12 @@ export default {
   },
 
   async mounted() {
-    this.initQuery()
-    this.gpsPoints = await this.fetch()
+    this.initQuery();
+    [this.gpsPoints, this.devices] = await Promise.all([
+      this.fetch(),
+      this.getMyDevices(),
+    ])
+
     this.map = this.createMap()
   },
 }

@@ -50,6 +50,11 @@
           </span>
         </p>
 
+        <p class="device" v-if="device">
+          <font-awesome-icon icon="fas fa-mobile-alt" />
+          {{ device.name }}
+        </p>
+
         <p class="locality" v-if="point.locality">{{ point.locality }}</p>
         <p class="postal-code" v-if="point.postalCode">{{ point.postalCode }}</p>
         <p class="country" v-if="country">
@@ -77,11 +82,15 @@ import { getCountryData, getEmojiFlag } from 'countries-list';
 
 import Dates from '../mixins/Dates.vue';
 import GPSPoint from '../models/GPSPoint';
+import UserDevice from '../models/UserDevice';
 
 export default {
   emit: ['close', 'edit', 'remove'],
   mixins: [Dates],
   props: {
+    device: {
+      type: [UserDevice, null],
+    },
     point: {
       type: [GPSPoint, null],
     },
@@ -269,6 +278,12 @@ export default {
         color: var(--color-heading);
       }
     }
+  }
+
+  .device {
+    font-size: 0.9em;
+    font-weight: bold;
+    letter-spacing: 0.05em;
   }
 
   .timestamp {

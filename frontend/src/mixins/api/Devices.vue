@@ -10,7 +10,7 @@ export default {
         await this.request(`/devices`) as {
           devices: UserDevice[]
         }
-      ).devices;
+      ).devices.map((device) => new UserDevice(device));
     },
 
     async registerDevice(name: string): Promise<UserDevice> {

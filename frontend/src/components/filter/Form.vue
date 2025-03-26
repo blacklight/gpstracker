@@ -138,6 +138,17 @@
              min="0" />
     </div>
 
+    <div class="device-container">
+      <label for="device">Device</label>
+      <select id="device"
+              name="device"
+              v-model="newFilter.deviceId"
+              :disabled="disabled">
+        <option value="">All</option>
+        <option v-for="device in devices" :key="device.id" :value="device.id">{{ device.name }}</option>
+      </select>
+    </div>
+
     <div class="footer">
       <button type="submit" :disabled="disabled || !changed">
         <font-awesome-icon icon="fas fa-check" />&nbsp;Apply
@@ -149,6 +160,8 @@
 <script lang="ts">
 import _ from 'lodash'
 
+import UserDevice from '../../models/UserDevice'
+
 export default {
   emit: [
     'next-page',
@@ -157,8 +170,13 @@ export default {
     'refresh',
     'set-resolution',
   ],
+
   props: {
     value: Object,
+    devices: {
+      type: Array as () => UserDevice[],
+      default: () => [],
+    },
     disabled: {
       type: Boolean,
       default: false,
