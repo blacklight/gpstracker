@@ -7,7 +7,7 @@
         <button @click="toggleMetric('altitude')"
                 :class="{ selected: showMetrics.altitude }"
                 :title="(showMetrics.altitude ? 'Hide' : 'Show') + ' altitude'">
-          <font-awesome-icon icon="ruler-vertical" />
+          <font-awesome-icon icon="mountain" />
         </button>
 
         <button @click="toggleMetric('distance')"
