@@ -1,28 +1,30 @@
+import { type Optional } from "./Types";
+
 class LocationQuery {
   public limit: number = 500;
-  public offset: number | null = null;
-  public deviceId: string | null = null;
-  public startDate: Date | null = null;
-  public endDate: Date | null = null;
-  public minId: number | null = null;
-  public maxId: number | null = null;
-  public country: string | null = null;
-  public locality: string | null = null;
-  public postalCode: string | null = null;
+  public offset: Optional<number> = null;
+  public deviceId: Optional<string> = null;
+  public startDate: Optional<Date> = null;
+  public endDate: Optional<Date> = null;
+  public minId: Optional<number> = null;
+  public maxId: Optional<number> = null;
+  public country: Optional<string> = null;
+  public locality: Optional<string> = null;
+  public postalCode: Optional<string> = null;
   public order: string = 'asc';
 
   constructor(data: {
-    limit?: number;
-    offset?: number;
-    deviceId?: string;
-    startDate?: Date;
-    endDate?: Date;
-    minId?: number;
-    maxId?: number;
-    country?: string;
-    locality?: string;
-    postalCode?: string;
-    order?: string;
+    limit?: Optional<number>;
+    offset?: Optional<number>;
+    deviceId?: Optional<string>;
+    startDate?: Optional<Date>;
+    endDate?: Optional<Date>;
+    minId?: Optional<number>;
+    maxId?: Optional<number>;
+    country?: Optional<string>;
+    locality?: Optional<string>;
+    postalCode?: Optional<string>;
+    order?: Optional<string>;
   }) {
     this.limit = data.limit || this.limit;
     this.offset = data.offset || this.offset;

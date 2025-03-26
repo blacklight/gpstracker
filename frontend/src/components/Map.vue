@@ -28,7 +28,7 @@
         </div>
 
         <PointInfo :point="selectedPoint"
-                   :device="devicesById[selectedPoint?.deviceId]"
+                   :device="selectedPoint ? devicesById[selectedPoint?.deviceId] : null"
                    ref="popup"
                    @remove="onRemove"
                    @edit="editPoint"
@@ -147,8 +147,8 @@ export default {
   },
 
   computed: {
-    devicesById(): Record<string, string> {
-      return this.devices.reduce((acc: Record<string, string>, device: any) => {
+    devicesById(): Record<string, UserDevice> {
+      return this.devices.reduce((acc: Record<string, UserDevice>, device: any) => {
         acc[device.id] = device
         return acc
       }, {})
