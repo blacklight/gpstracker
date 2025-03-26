@@ -31,3 +31,7 @@ coverage
 *.sqlite
 *.sqlite3
 data/
+
+# HTTP request files
+*.http
+*env.json
