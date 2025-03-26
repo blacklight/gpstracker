@@ -1,5 +1,5 @@
 class LocationQuery {
-  public limit: number = 250;
+  public limit: number = 500;
   public offset: number | null = null;
   public deviceId: string | null = null;
   public startDate: Date | null = null;
