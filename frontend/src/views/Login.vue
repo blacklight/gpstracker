@@ -91,7 +91,7 @@ export default {
 
   mounted() {
     this.$nextTick(() => {
-      (this.$refs.username as HTMLElement).focus();
+      (this.$refs.username as HTMLElement | null)?.focus();
     });
   },
 };
