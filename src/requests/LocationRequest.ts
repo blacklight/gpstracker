@@ -39,7 +39,7 @@ class LocationRequest {
     order?: string;
   }) {
     this.userId = req.userId;
-    this.deviceId = req.deviceId;
+    this.deviceId = req.deviceId?.length ? req.deviceId : this.deviceId;
     this.initNumber('limit', req);
     this.initNumber('offset', req);
     this.initDate('startDate', req);
@@ -83,6 +83,11 @@ class LocationRequest {
 
     if (this.offset != null) {
       queryMap.offset = this.offset;
+    }
+
+    if (this.deviceId != null) {
+      const deviceIds = this.deviceId.split(/\s*,\s*/);
+      where[db.locationTableColumns.deviceId || 'deviceId'] = {[Op.in]: deviceIds};
     }
 
     const colMapping: any = db.locationTableColumns
