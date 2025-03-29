@@ -1,6 +1,8 @@
 <script lang="ts">
 import _ from 'lodash'
 
+import LocationQueryMixin from './LocationQuery.vue'
+
 function isDate(key: string, value: string): boolean {
   return (
     (
@@ -37,6 +39,7 @@ function encodeValue(value: string | number | boolean | Date): string {
 }
 
 export default {
+  mixins: [LocationQueryMixin],
   data() {
     return {
       query: this.parseQuery(window.location.href),
@@ -60,10 +63,6 @@ export default {
         }, {})
     },
 
-    isQueryChanged(oldQuery: Record<string, any>, newQuery: Record<string, any>): boolean {
-      return !_.isEqual(oldQuery, newQuery)
-    },
-
     toQueryString(values: Record<string, any>) {
       return Object.entries(values)
         .filter(([_, value]) => value != null && value.toString() !== '[object Object]')
@@ -78,10 +77,10 @@ export default {
   },
 
   watch: {
-    $route(newRoute, oldRoute) {
+    $route(newRoute: { fullPath: string }, oldRoute: { fullPath: string }) {
       const oldQuery = this.parseQuery(oldRoute.fullPath)
       const newQuery = this.parseQuery(newRoute.fullPath)
-      if (this.isQueryChanged(oldQuery, newQuery)) {
+      if (this.isQueryChanged({oldValue: oldQuery, newValue: newQuery})) {
         this.query = newQuery
       }
     },

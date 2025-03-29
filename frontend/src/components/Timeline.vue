@@ -210,6 +210,12 @@ export default {
         }
       }
 
+      const xTicks = {} as { min?: Date, max?: Date }
+      if (this.points.length > 1) {
+        xTicks.min = this.points[0].timestamp
+        xTicks.max = this.points[this.points.length - 1].timestamp
+      }
+
       return {
         responsive: true,
         maintainAspectRatio: false,
@@ -245,9 +251,9 @@ export default {
               drawTicks: true,
             },
             time: {
-              tooltipFormat: 'MMM dd, HH:mm',
-              unit: 'minute',
+              tooltipFormat: 'MMM dd yyyy, HH:mm',
             },
+            ticks: xTicks,
             title: {
               display: true,
               text: 'Date'

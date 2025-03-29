@@ -2,6 +2,11 @@
   <main>
     <div class="loading" v-if="loading">Loading...</div>
     <div class="map-body" v-else>
+      <MapSelectOverlay
+        @close="showSelectOverlay = false"
+        @select="onAreaSelect"
+        v-if="showSelectOverlay" />
+
       <div id="map">
         <div class="time-range" v-if="oldestPoint && newestPoint">
           <div class="row">
@@ -51,6 +56,16 @@
           <FilterButton @input="showControls = !showControls"
                         :value="showControls" />
         </div>
+
+        <div class="floating-buttons-container">
+          <div class="floating-buttons">
+            <FloatingButton
+                :icon="'fas ' + (hasSelectionBox ? 'fa-remove' : 'fa-object-ungroup')"
+                :title="showSelectOverlay || hasSelectionBox ? 'Reset selection' : 'Filter by area'"
+                :primary="showSelectOverlay || hasSelectionBox"
+                @click="onSelectOverlayButtonClick" />
+          </div>
+        </div>
       </div>
 
       <div class="timeline">
@@ -94,8 +109,11 @@ import Dates from '../mixins/Dates.vue';
 import Feature from 'ol/Feature';
 import FilterButton from './filter/ToggleButton.vue';
 import FilterForm from './filter/Form.vue';
+import FloatingButton from '../elements/FloatingButton.vue';
 import GPSPoint from '../models/GPSPoint';
 import LocationQuery from '../models/LocationQuery';
+import LocationQueryMixin from '../mixins/LocationQuery.vue';
+import MapSelectOverlay from './MapSelectOverlay.vue';
 import MapView from '../mixins/MapView.vue';
 import Paginate from '../mixins/Paginate.vue';
 import Points from '../mixins/Points.vue';
@@ -111,6 +129,7 @@ export default {
   mixins: [
     Api,
     Dates,
+    LocationQueryMixin,
     MapView,
     Paginate,
     Points,
@@ -122,6 +141,8 @@ export default {
     ConfirmDialog,
     FilterButton,
     FilterForm,
+    FloatingButton,
+    MapSelectOverlay,
     PointInfo,
     Timeline,
   },
@@ -135,7 +156,6 @@ export default {
       pointToRemove: null as Optional<GPSPoint>,
       pointsLayer: null as Optional<VectorLayer>,
       popup: null as Optional<Overlay>,
-      queryInitialized: false,
       refreshPoints: 0,
       routesLayer: null as Optional<VectorLayer>,
       selectedFeature: null as Optional<Feature>,
@@ -143,6 +163,7 @@ export default {
       selectedPointIndex: null as Optional<number>,
       showControls: false,
       showMetrics: new TimelineMetricsConfiguration(),
+      showSelectOverlay: false,
     }
   },
 
@@ -158,6 +179,13 @@ export default {
       // Reference refreshPoints to force reactivity
       this.refreshPoints;
       return this.groupPoints(this.gpsPoints)
+    },
+
+    hasSelectionBox(): boolean {
+      return this.locationQuery.minLongitude != null &&
+        this.locationQuery.minLatitude != null &&
+        this.locationQuery.maxLongitude != null &&
+        this.locationQuery.maxLatitude != null
     },
 
     mappedPoints(): Record<string, Point> {
@@ -378,26 +406,72 @@ export default {
     setShowMetrics(metrics: any) {
       Object.assign(this.showMetrics, metrics)
     },
+
+    onAreaSelect(selectionBox: number[][]) {
+      this.showSelectOverlay = false
+      if (!selectionBox.length) {
+        return
+      }
+
+      let [start, end] = selectionBox
+      if (!(start && end)) {
+        return
+      }
+
+      start = this.map.getCoordinateFromPixel(start)
+      end = this.map.getCoordinateFromPixel(end)
+      const [startLon, startLat, endLon, endLat] = [
+        Math.min(start[0], end[0]),
+        Math.min(start[1], end[1]),
+        Math.max(start[0], end[0]),
+        Math.max(start[1], end[1]),
+      ]
+
+      this.locationQuery = {
+        ...this.locationQuery,
+        startDate: null,
+        endDate: null,
+        minLongitude: startLon,
+        minLatitude: startLat,
+        maxLongitude: endLon,
+        maxLatitude: endLat,
+      }
+    },
+
+    onSelectOverlayButtonClick() {
+      if (!this.hasSelectionBox) {
+        this.showSelectOverlay = true
+      } else {
+        this.locationQuery = {
+          ...this.locationQuery,
+          minLongitude: null,
+          minLatitude: null,
+          maxLongitude: null,
+          maxLatitude: null,
+        }
+      }
+    },
   },
 
   watch: {
     locationQuery: {
-      async handler(newQuery, oldQuery) {
-        const isFirstQuery = !this.queryInitialized
+      async handler(newQuery: LocationQuery, oldQuery: LocationQuery) {
+        if (!this.isQueryChanged({
+          newValue: newQuery,
+          oldValue: oldQuery,
+        })) {
+          return
+        }
 
         // If startDate/endDate have changed, reset minId/maxId
-        if (!isFirstQuery &&
-          (newQuery.startDate !== oldQuery.startDate || newQuery.endDate !== oldQuery.endDate)
-        ) {
+        if (newQuery.startDate !== oldQuery.startDate || newQuery.endDate !== oldQuery.endDate) {
           newQuery.minId = null
           newQuery.maxId = null
           this.hasNextPage = true
           this.hasPrevPage = true
         }
 
-        // Results with maxId should be retrieved in descending order,
-        // otherwise all results should be retrieved in ascending order
-        newQuery.order = newQuery.maxId ? 'desc' : 'asc'
+        newQuery.order = 'desc'
         this.setQuery(
           {
             ...newQuery,
@@ -406,32 +480,28 @@ export default {
           }
         )
 
-        this.queryInitialized = true
+        const gpsPoints = await this.fetch()
 
-        if (!isFirstQuery) {
-          const gpsPoints = await this.fetch()
-
-          // If there are no points, and minId/maxId are set, reset them
-          // and don't update the map (it means that we have reached the
-          // start/end of the current window)
-          if (gpsPoints.length < 2 && (newQuery.minId || newQuery.maxId)) {
-            if (newQuery.minId) {
-              this.hasNextPage = false
-            }
-
-            if (newQuery.maxId) {
-              this.hasPrevPage = false
-            }
-
-            newQuery.minId = oldQuery.minId
-            newQuery.maxId = oldQuery.maxId
-            return
+        // If there are no points, and minId/maxId are set, reset them
+        // and don't update the map (it means that we have reached the
+        // start/end of the current window)
+        if (gpsPoints.length < 2 && (newQuery.minId || newQuery.maxId)) {
+          if (newQuery.minId) {
+            this.hasNextPage = false
           }
 
-          this.gpsPoints = gpsPoints
-          this.hasNextPage = gpsPoints.length > 1
-          this.hasPrevPage = gpsPoints.length > 1
+          if (newQuery.maxId) {
+            this.hasPrevPage = false
+          }
+
+          newQuery.minId = oldQuery.minId
+          newQuery.maxId = oldQuery.maxId
+          return
         }
+
+        this.gpsPoints = gpsPoints
+        this.hasNextPage = gpsPoints.length > 1
+        this.hasPrevPage = gpsPoints.length > 1
 
         if (this.mapView) {
           this.refreshMap()
@@ -474,9 +544,8 @@ export default {
 
 <style lang="scss" scoped>
 @use "@/styles/common.scss" as *;
+@use "./vars.scss" as *;
 @import "ol/ol.css";
-
-$timeline-height: 10rem;
 
 main {
   width: 100%;
@@ -554,6 +623,25 @@ main {
   align-items: center;
   padding-top: 0.5em;
   box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
+}
+
+.floating-buttons-container {
+  width: 100%;
+  height: 5em;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
+  .floating-buttons {
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+
+    :deep(button) {
+      position: absolute;
+    }
+  }
 }
 
 :deep(.ol-viewport) {

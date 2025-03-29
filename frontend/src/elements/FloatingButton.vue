@@ -1,7 +1,9 @@
 <template>
   <button class="floating-button"
+          :class="{ primary }"
           @click="$emit('click')"
           :title="title"
+          :style="style"
           :aria-label="title">
     <font-awesome-icon :icon="icon" />
   </button>
@@ -16,6 +18,16 @@ export default {
       required: true,
     },
 
+    primary: {
+      type: Boolean,
+      default: false,
+    },
+
+    style: {
+      type: Object,
+      default: () => ({}),
+    },
+
     title: {
       type: String,
     },
@@ -28,8 +40,6 @@ button.floating-button {
   position: fixed;
   bottom: 1em;
   right: 1em;
-  background: var(--color-accent);
-  color: var(--color-background);
   width: 4em;
   height: 4em;
   font-size: 1em;
@@ -42,10 +52,20 @@ button.floating-button {
   z-index: 100;
 
   &:hover {
-    background: var(--color-accent) !important;
-    color: var(--color-background) !important;
     font-weight: bold;
     filter: brightness(1.2);
+  }
+
+  &.primary {
+    background: var(--color-accent);
+    color: var(--color-background);
+
+    &:hover {
+      background: var(--color-accent) !important;
+      color: var(--color-background) !important;
+      font-weight: bold;
+      filter: brightness(1.2);
+    }
   }
 }
 </style>

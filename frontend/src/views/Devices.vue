@@ -23,6 +23,7 @@
     <FloatingButton
         icon="fas fa-plus"
         title="Register a new device"
+        :primary="true"
         @click="showDeviceForm = true" />
   </div>
 </template>

@@ -8,7 +8,7 @@ export default {
       gpsPoints: [] as GPSPoint[],
       hasNextPage: true,
       hasPrevPage: true,
-      locationQuery: new LocationQuery({}),
+      locationQuery: new LocationQuery({}) as LocationQuery,
     }
   },
 

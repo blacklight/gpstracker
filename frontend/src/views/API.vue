@@ -19,6 +19,7 @@
     <FloatingButton
         icon="fas fa-plus"
         title="Create a new API token"
+        :primary="true"
         @click="showTokenForm = true" />
   </div>
 </template>

@@ -15,6 +15,10 @@ class LocationRequest {
   endDate: Optional<Date> = null;
   minId: Optional<number> = null;
   maxId: Optional<number> = null;
+  minLatitude: Optional<number> = null;
+  maxLatitude: Optional<number> = null;
+  minLongitude: Optional<number> = null;
+  maxLongitude: Optional<number> = null;
   country: Optional<string> = null;
   locality: Optional<string> = null;
   postalCode: Optional<string> = null;
@@ -31,6 +35,10 @@ class LocationRequest {
     endDate?: Date;
     minId?: number;
     maxId?: number;
+    minLatitude?: number;
+    maxLatitude?: number;
+    minLongitude?: number;
+    maxLongitude?: number;
     country?: string;
     locality?: string;
     postalCode?: string;
@@ -46,6 +54,10 @@ class LocationRequest {
     this.initDate('endDate', req);
     this.initNumber('minId', req);
     this.initNumber('maxId', req);
+    this.initNumber('minLatitude', req, parseFloat);
+    this.initNumber('maxLatitude', req, parseFloat);
+    this.initNumber('minLongitude', req, parseFloat);
+    this.initNumber('maxLongitude', req, parseFloat);
     this.country = req.country;
     this.locality = req.locality;
     this.postalCode = req.postalCode;
@@ -54,9 +66,9 @@ class LocationRequest {
     this.order = (req.order || this.order).toUpperCase() as Order;
   }
 
-  private initNumber(key: string, req: any): void {
+  private initNumber(key: string, req: any, parser: (s: string) => number = parseInt): void {
     if (req[key] != null) {
-      const numValue = (this as any)[key] = parseInt(req[key]);
+      const numValue = (this as any)[key] = parser(req[key]);
       if (isNaN(numValue)) {
         throw new ValidationError(`Invalid value for ${key}: ${req[key]}`);
       }
@@ -125,6 +137,30 @@ class LocationRequest {
 
     if (this.description != null) {
       where[colMapping.description || 'description'] = {[Op.like]: `%${this.description}%`};
+    }
+
+    if (this.minLatitude != null || this.maxLatitude != null) {
+      const column = colMapping.latitude || 'latitude';
+      const where_lat: any = where[column] = {};
+      if (this.minLatitude == null && this.maxLatitude != null) {
+        where_lat[Op.lte] = this.maxLatitude;
+      } else if (this.minLatitude != null && this.maxLatitude == null) {
+        where_lat[Op.gte] = this.minLatitude;
+      } else {
+        where_lat[Op.between] = [this.minLatitude, this.maxLatitude];
+      }
+    }
+
+    if (this.minLongitude != null || this.maxLongitude != null) {
+      const column = colMapping.longitude || 'longitude';
+      const where_lon: any = where[column] = {};
+      if (this.minLongitude == null && this.maxLongitude != null) {
+        where_lon[Op.lte] = this.maxLongitude;
+      } else if (this.minLongitude != null && this.maxLongitude == null) {
+        where_lon[Op.gte] = this.minLongitude;
+      } else {
+        where_lon[Op.between] = [this.minLongitude, this.maxLongitude];
+      }
     }
 
     queryMap.where = where;

@@ -2,7 +2,16 @@
   <form class="filter-view" @submit.prevent.stop="handleSubmit">
     <h2>Filter</h2>
 
-    <div class="date-selectors">
+    <div class="date-range-toggle">
+      <input type="checkbox"
+             id="date-range-toggle"
+             name="date-range-toggle"
+             v-model="enableDateRange"
+             :disabled="disabled" />
+      <label for="date-range-toggle">Enable Date Range</label>
+    </div>
+
+    <div class="date-selectors" v-if="enableDateRange">
       <div class="date-selector">
         <label for="start-date">Start Date</label>
         <input type="datetime-local"
@@ -160,9 +169,12 @@
 <script lang="ts">
 import _ from 'lodash'
 
+import LocationQuery from '../../models/LocationQuery'
+import LocationQueryMixin from '../../mixins/LocationQuery.vue'
 import UserDevice from '../../models/UserDevice'
 
 export default {
+  mixins: [LocationQueryMixin],
   emit: [
     'next-page',
     'prev-page',
@@ -172,7 +184,7 @@ export default {
   ],
 
   props: {
-    value: Object,
+    value: LocationQuery,
     devices: {
       type: Array as () => UserDevice[],
       default: () => [],
@@ -204,51 +216,13 @@ export default {
   data() {
     return {
       changed: false,
+      enableDateRange: false,
       newFilter: {...this.value},
       newResolution: this.resolution,
     }
   },
 
   methods: {
-    hasChanged(oldValue: any, newValue: any): boolean {
-      return !_.isEqual(
-        {
-          ...oldValue,
-          startDate: this.normalizeDate(this.value?.startDate),
-          endDate: this.normalizeDate(this.value?.endDate),
-        },
-        {
-          ...newValue,
-          startDate: this.normalizeDate(this.newFilter.startDate),
-          endDate: this.normalizeDate(this.newFilter.endDate),
-        }
-      )
-    },
-
-    normalizeDate(date: any): Date | null {
-      if (!date) {
-        return null
-      }
-
-      if (typeof date === 'number' || typeof date === 'string') {
-        date = new Date(date)
-      }
-
-      // Round to the nearest minute
-      return new Date(Math.floor(date.getTime() / 60000) * 60000)
-    },
-
-    toLocalString(date: Date | string | number | null): string {
-      const d = this.normalizeDate(date)
-      if (!d) {
-        return ''
-      }
-
-      return new Date(
-        d.getTime() - (d.getTimezoneOffset() * 60000)
-      ).toISOString().slice(0, -8)
-    },
-
     startPlusHours(date: Date | number | Event | undefined | null, hours: number): Date | null {
       if ((date as any)?.target?.value) {
         date = (date as any).target.value
@@ -316,11 +290,19 @@ export default {
     setResolution(event: Event) {
       this.newResolution = Number((event.target as HTMLInputElement).value)
     },
+
+    initDateRange(value: LocationQuery) {
+      this.enableDateRange = !!(value.startDate && value.endDate)
+    },
+  },
+
+  mounted() {
+    this.initDateRange(this.value)
   },
 
   watch: {
     value: {
-      handler(value) {
+      handler(value: LocationQuery) {
         this.newFilter = {...value}
         this.changed = false
       },
@@ -329,15 +311,34 @@ export default {
     },
 
     newFilter: {
-      handler(value) {
-        this.changed = this.hasChanged(this.value, value)
+      handler(value: LocationQuery) {
+        this.changed = this.isQueryChanged({
+          newValue: value,
+          oldValue: this.value
+        })
+        this.initDateRange(value)
       },
       immediate: true,
       deep: true,
     },
 
-    newResolution(value) {
+    newResolution(value: number) {
       this.changed = this.changed || value !== this.resolution
+    },
+
+    enableDateRange(value: boolean) {
+      if (!value) {
+        this.newFilter.startDate = null
+        this.newFilter.endDate = null
+      } else {
+        if (!this.newFilter.startDate) {
+          this.newFilter.startDate = new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        }
+
+        if (!this.newFilter.endDate) {
+          this.newFilter.endDate = new Date()
+        }
+      }
     },
   },
 }
@@ -405,6 +406,16 @@ export default {
           font-size: 0.75em;
         }
       }
+    }
+  }
+
+  .date-range-toggle {
+    display: flex;
+    align-items: center;
+    margin: 0.5em 0 -0.5em 0;
+
+    input {
+      margin-right: 0.25em;
     }
   }
 

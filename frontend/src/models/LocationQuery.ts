@@ -8,10 +8,14 @@ class LocationQuery {
   public endDate: Optional<Date> = null;
   public minId: Optional<number> = null;
   public maxId: Optional<number> = null;
+  public minLatitude: Optional<number> = null;
+  public maxLatitude: Optional<number> = null;
+  public minLongitude: Optional<number> = null;
+  public maxLongitude: Optional<number> = null;
   public country: Optional<string> = null;
   public locality: Optional<string> = null;
   public postalCode: Optional<string> = null;
-  public order: string = 'asc';
+  public order: string = 'desc';
 
   constructor(data: {
     limit?: Optional<number>;
@@ -21,6 +25,10 @@ class LocationQuery {
     endDate?: Optional<Date>;
     minId?: Optional<number>;
     maxId?: Optional<number>;
+    minLatitude?: Optional<number>;
+    maxLatitude?: Optional<number>;
+    minLongitude?: Optional<number>;
+    maxLongitude?: Optional<number>;
     country?: Optional<string>;
     locality?: Optional<string>;
     postalCode?: Optional<string>;
@@ -33,16 +41,14 @@ class LocationQuery {
     this.endDate = data.endDate || this.endDate;
     this.minId = data.minId || this.minId;
     this.maxId = data.maxId || this.maxId;
+    this.minLatitude = data.minLatitude || this.minLatitude;
+    this.maxLatitude = data.maxLatitude || this.maxLatitude;
+    this.minLongitude = data.minLongitude || this.minLongitude;
+    this.maxLongitude = data.maxLongitude || this.maxLongitude;
     this.country = data.country || this.country;
     this.locality = data.locality || this.locality;
     this.postalCode = data.postalCode || this.postalCode;
     this.order = data.order || this.order;
-
-    if (!(this.startDate && this.endDate)) {
-      // Default to the past 24 hours
-      this.endDate = new Date();
-      this.startDate = new Date(this.endDate.getTime() - 24 * 60 * 60 * 1000);
-    }
   }
 }
 
