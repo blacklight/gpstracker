@@ -9,6 +9,9 @@ class GPSPoint {
   public country: string | null;
   public postalCode: string | null;
   public description: string | null;
+  public battery: number | null;
+  public speed: number | null;
+  public accuracy: number | null;
   public timestamp: Date;
 
   constructor(record: any) {
@@ -22,6 +25,9 @@ class GPSPoint {
     this.country = record.country;
     this.postalCode = record.postalCode;
     this.description = record.description;
+    this.battery = record.battery;
+    this.speed = record.speed;
+    this.accuracy = record.accuracy;
     this.timestamp = record.timestamp;
   }
 }

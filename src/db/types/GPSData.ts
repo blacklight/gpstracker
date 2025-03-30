@@ -74,6 +74,30 @@ function GPSData(locationTableColumns: Record<string, string>): Record<string, a
     };
   }
 
+  const batteryCol: string = locationTableColumns['battery'];
+  if (batteryCol?.length) {
+    typeDef[batteryCol] = {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    };
+  }
+
+  const speedCol: string = locationTableColumns['speed'];
+  if (speedCol?.length) {
+    typeDef[speedCol] = {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    };
+  }
+
+  const accuracyCol: string = locationTableColumns['accuracy'];
+  if (accuracyCol?.length) {
+    typeDef[accuracyCol] = {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    };
+  }
+
   typeDef[locationTableColumns['timestamp']] = {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

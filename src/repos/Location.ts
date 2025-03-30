@@ -41,6 +41,9 @@ class Location {
           country: data[mappings.country],
           postalCode: data[mappings.postalCode],
           description: data[mappings.description],
+          battery: data[mappings.battery],
+          speed: data[mappings.speed],
+          accuracy: data[mappings.accuracy],
           timestamp: data[mappings.timestamp],
         });
       });
@@ -78,6 +81,9 @@ class Location {
           country: data[mappings.country],
           postalCode: data[mappings.postalCode],
           description: data[mappings.description],
+          battery: data[mappings.battery],
+          speed: data[mappings.speed],
+          accuracy: data[mappings.accuracy],
           timestamp: data[mappings.timestamp],
         });
       });
@@ -111,6 +117,9 @@ class Location {
               [mappings.country]: p.country,
               [mappings.postalCode]: p.postalcode,
               [mappings.description]: p.description,
+              [mappings.battery]: p.battery,
+              [mappings.speed]: p.speed,
+              [mappings.accuracy]: p.accuracy,
               [mappings.timestamp]: p.timestamp
             }
           },
@@ -129,6 +138,9 @@ class Location {
           country: data[mappings.country],
           postalCode: data[mappings.postalCode],
           description: data[mappings.description],
+          battery: data[mappings.battery],
+          speed: data[mappings.speed],
+          accuracy: data[mappings.accuracy],
           timestamp: data[mappings.timestamp],
         });
       });
@@ -162,6 +174,9 @@ class Location {
             [mappings.country]: p.country,
             [mappings.postalCode]: p.postalcode,
             [mappings.description]: p.description,
+            [mappings.battery]: p.battery,
+            [mappings.speed]: p.speed,
+            [mappings.accuracy]: p.accuracy,
             [mappings.timestamp]: p.timestamp
           }
         }),

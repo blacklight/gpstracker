@@ -9,6 +9,9 @@ class GPSPoint {
   public country: string;
   public postalCode: string;
   public description?: string;
+  public battery?: number;
+  public speed?: number;
+  public accuracy?: number;
   public timestamp: Date;
 
   constructor({
@@ -22,6 +25,9 @@ class GPSPoint {
     country,
     postalCode,
     description,
+    battery,
+    speed,
+    accuracy,
     timestamp,
   }: {
     id: number;
@@ -34,6 +40,9 @@ class GPSPoint {
     country: string;
     postalCode: string;
     description?: string;
+    battery?: number;
+    speed?: number;
+    accuracy?: number;
     timestamp: Date;
   }) {
     this.id = id;
@@ -46,6 +55,9 @@ class GPSPoint {
     this.country = country;
     this.postalCode = postalCode;
     this.description = description;
+    this.battery = battery;
+    this.speed = speed;
+    this.accuracy = accuracy;
     this.timestamp = timestamp;
   }
 }
