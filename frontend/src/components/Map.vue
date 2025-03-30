@@ -44,13 +44,8 @@
             <FilterForm :value="locationQuery"
                         :devices="devices"
                         :disabled="loading"
-                        :has-next-page="hasNextPage"
-                        :has-prev-page="hasPrevPage"
                         :resolution="resolutionMeters"
                         @refresh="locationQuery = $event"
-                        @reset-page="locationQuery.minId = locationQuery.maxId = null"
-                        @next-page="fetchNextPage"
-                        @prev-page="fetchPrevPage"
                         @set-resolution="setResolution" />
           </div>
           <FilterButton @input="showControls = !showControls"
@@ -70,8 +65,12 @@
 
       <div class="timeline">
         <Timeline :loading="loading"
+                  :locationQuery="locationQuery"
                   :points="gpsPoints"
                   :show-metrics="showMetrics"
+                  @next-page="fetchNextPage"
+                  @prev-page="fetchPrevPage"
+                  @reset-page="resetPage"
                   @point-hover="onTimelinePointHover"
                   @show-metrics="setShowMetrics" />
       </div>
@@ -283,6 +282,12 @@ export default {
       this.locationQuery = prevPageQuery
     },
 
+    async resetPage() {
+      const oldQuery = { ...this.locationQuery }
+      this.locationQuery.minId = this.locationQuery.maxId = null
+      await this.processQueryChange(this.locationQuery, oldQuery)
+    },
+
     createMap(): Map {
       this.pointsLayer = this.createPointsLayer(Object.values(this.mappedPoints) as Point[])
       this.routesLayer = this.createRoutesLayer(Object.values(this.mappedPoints) as Point[])
@@ -431,6 +436,8 @@ export default {
         ...this.locationQuery,
         startDate: null,
         endDate: null,
+        minId: null,
+        maxId: null,
         minLongitude: startLon,
         minLatitude: startLat,
         maxLongitude: endLon,
@@ -444,6 +451,8 @@ export default {
       } else {
         this.locationQuery = {
           ...this.locationQuery,
+          minId: null,
+          maxId: null,
           minLongitude: null,
           minLatitude: null,
           maxLongitude: null,
@@ -451,18 +460,8 @@ export default {
         }
       }
     },
-  },
 
-  watch: {
-    locationQuery: {
-      async handler(newQuery: LocationQuery, oldQuery: LocationQuery) {
-        if (!this.isQueryChanged({
-          newValue: newQuery,
-          oldValue: oldQuery,
-        })) {
-          return
-        }
-
+    async processQueryChange(newQuery: LocationQuery, oldQuery: LocationQuery) {
         // If startDate/endDate have changed, reset minId/maxId
         if (newQuery.startDate !== oldQuery.startDate || newQuery.endDate !== oldQuery.endDate) {
           newQuery.minId = null
@@ -506,6 +505,20 @@ export default {
         if (this.mapView) {
           this.refreshMap()
         }
+      },
+  },
+
+  watch: {
+    locationQuery: {
+      async handler(newQuery: LocationQuery, oldQuery: LocationQuery) {
+        if (!this.isQueryChanged({
+          newValue: newQuery,
+          oldValue: oldQuery,
+        })) {
+          return
+        }
+
+        await this.processQueryChange(newQuery, oldQuery)
       },
       deep: true,
     },

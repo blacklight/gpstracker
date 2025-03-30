@@ -86,24 +86,6 @@
     </div>
 
     <div class="pagination-container">
-      <div class="page-button-container">
-        <button type="button"
-                :disabled="disabled"
-                v-if="value?.minId || value?.maxId"
-                @click.stop="$emit('reset-page')">
-          <font-awesome-icon icon="fas fa-undo" />
-        </button>
-      </div>
-
-      <div class="page-button-container">
-        <button type="button"
-                @click="$emit('prev-page')"
-                title="Previous Results"
-                :disabled="disabled || !hasPrevPage">
-          <font-awesome-icon icon="fas fa-chevron-left" />
-        </button>
-      </div>
-
       <div class="limit-container">
         <label for="limit">Max Results</label>
         <input type="number"
@@ -114,15 +96,6 @@
                :value="newFilter.limit"
                :disabled="disabled"
                min="1" />
-      </div>
-
-      <div class="page-button-container">
-        <button type="button"
-                @click="$emit('next-page')"
-                title="Next Results"
-                :disabled="disabled || !hasNextPage">
-          <font-awesome-icon icon="fas fa-chevron-right" />
-        </button>
       </div>
     </div>
 
@@ -176,9 +149,6 @@ import UserDevice from '../../models/UserDevice'
 export default {
   mixins: [LocationQueryMixin],
   emit: [
-    'next-page',
-    'prev-page',
-    'reset-page',
     'refresh',
     'set-resolution',
   ],
@@ -192,14 +162,6 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
-    },
-    hasPrevPage: {
-      type: Boolean,
-      default: true,
-    },
-    hasNextPage: {
-      type: Boolean,
-      default: true,
     },
     resolution: {
       type: Number,
@@ -430,11 +392,6 @@ export default {
       display: flex;
       flex-direction: column;
       align-items: center;
-    }
-
-    .page-button-container {
-      display: flex;
-      justify-content: center;
     }
 
     label {

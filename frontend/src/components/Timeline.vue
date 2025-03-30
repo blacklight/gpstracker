@@ -23,8 +23,30 @@
         </button>
       </div>
 
+      <div class="page-button-container">
+        <button @click="$emit('prev-page')"
+                title="Previous results">
+          <font-awesome-icon icon="chevron-left" />
+        </button>
+      </div>
+
       <div class="timeline">
         <Line :data="graphData" :options="graphOptions" />
+      </div>
+
+      <div class="page-button-container">
+        <button @click="$emit('next-page')"
+                title="Next results">
+          <font-awesome-icon icon="chevron-right" />
+        </button>
+      </div>
+
+      <div class="page-button-container"
+           v-if="locationQuery?.minId || locationQuery?.maxId">
+        <button @click="$emit('reset-page')"
+                title="Reset pagination">
+          <font-awesome-icon icon="fas fa-undo" />
+        </button>
       </div>
     </div>
   </div>
@@ -47,6 +69,7 @@ import 'chartjs-adapter-date-fns';
 
 import Geo from '../mixins/Geo.vue';
 import GPSPoint from '../models/GPSPoint';
+import LocationQuery from '../models/LocationQuery';
 import TimelineMetricsConfiguration from '../models/TimelineMetricsConfiguration';
 
 ChartJS.register(
@@ -60,7 +83,13 @@ ChartJS.register(
 );
 
 export default {
-  emits: ['point-hover', 'show-metrics'],
+  emits: [
+    'next-page',
+    'point-hover',
+    'prev-page',
+    'reset-page',
+    'show-metrics',
+  ],
   mixins: [Geo],
   components: {
     Line,
@@ -70,6 +99,9 @@ export default {
     loading: {
       type: Boolean,
       default: false,
+    },
+    locationQuery: {
+      type: LocationQuery,
     },
     points: {
       type: Array as () => GPSPoint[],
@@ -329,6 +361,28 @@ $options-width: 5em;
     &.selected {
       background: var(--vt-c-blue-bg-dark);
       color: var(--vt-c-white);
+    }
+  }
+}
+
+.page-button-container {
+  width: 3em;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  button {
+    width: 100%;
+    height: 100%;
+    font-size: 1em;
+    background-color: var(--color-background);
+    border: 0;
+    margin-left: 0.5em;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-hover);
     }
   }
 }
