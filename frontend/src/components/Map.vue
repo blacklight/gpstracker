@@ -474,7 +474,7 @@ export default {
           this.hasPrevPage = true
         }
 
-        newQuery.order = 'desc'
+        newQuery.order = newQuery.order || 'desc'
         this.setQuery(
           {
             ...newQuery,

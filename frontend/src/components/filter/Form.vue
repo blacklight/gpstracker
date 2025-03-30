@@ -99,6 +99,17 @@
       </div>
     </div>
 
+    <div class="order-container">
+      <label for="order">Order</label>
+      <select id="order"
+              name="order"
+              v-model="newFilter.order"
+              :disabled="disabled">
+        <option value="asc">Oldest points first</option>
+        <option value="desc">Newest points first</option>
+      </select>
+    </div>
+
     <div class="resolution-container">
       <label for="resolution">
         <p class="title">
@@ -239,7 +250,7 @@ export default {
     },
 
     handleSubmit() {
-      this.$emit('refresh', this.newFilter)
+      this.$emit('refresh', new LocationQuery(this.newFilter))
       if (this.newResolution !== this.resolution) {
         this.$emit('set-resolution', this.newResolution)
       }
