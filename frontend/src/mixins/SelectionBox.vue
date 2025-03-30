@@ -30,7 +30,9 @@ export default {
 
   methods: {
     scaledPointerCoordinates(event: MouseEvent): number[] {
+      // @ts-ignore
       const offsetLeft = this.$refs.overlay?.getBoundingClientRect().left || 0
+      // @ts-ignore
       const offsetTop = this.$refs.overlay?.getBoundingClientRect().top || 0
 
       return [
@@ -55,7 +57,6 @@ export default {
 
     onOverlayDragStart(event: MouseEvent) {
       this.setSelectionBoxCoordinates(event)
-      this.overlayDragging = true
     },
 
     onOverlayDragEnd(event: MouseEvent) {
@@ -70,12 +71,10 @@ export default {
       ) {
         this.selectionBox = []
       }
-
-      this.overlayDragging = false
     },
 
     onOverlayMove(event: MouseEvent) {
-      if (!this.overlayDragging || this.selectionBox.length < 1) {
+      if (this.selectionBox.length < 1) {
         return
       }
 

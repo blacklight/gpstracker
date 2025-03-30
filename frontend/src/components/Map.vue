@@ -423,13 +423,17 @@ export default {
         return
       }
 
-      start = this.map.getCoordinateFromPixel(start)
-      end = this.map.getCoordinateFromPixel(end)
+      const startPoint = this.map?.getCoordinateFromPixel(start)
+      const endPoint = this.map?.getCoordinateFromPixel(end)
+      if (!(startPoint && endPoint)) {
+        return
+      }
+
       const [startLon, startLat, endLon, endLat] = [
-        Math.min(start[0], end[0]),
-        Math.min(start[1], end[1]),
-        Math.max(start[0], end[0]),
-        Math.max(start[1], end[1]),
+        Math.min(startPoint[0], endPoint[0]),
+        Math.min(startPoint[1], endPoint[1]),
+        Math.max(startPoint[0], endPoint[0]),
+        Math.max(startPoint[1], endPoint[1]),
       ]
 
       this.locationQuery = {

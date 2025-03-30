@@ -254,12 +254,14 @@ export default {
     },
 
     initDateRange(value: LocationQuery) {
-      this.enableDateRange = !!(value.startDate && value.endDate)
+      this.enableDateRange = !!(value?.startDate && value?.endDate)
     },
   },
 
   mounted() {
-    this.initDateRange(this.value)
+    if (this.value) {
+      this.initDateRange(this.value)
+    }
   },
 
   watch: {

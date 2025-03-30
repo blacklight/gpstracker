@@ -38,7 +38,9 @@ export default {
       }
 
       const scaledCoords = [
+        // @ts-ignore
         this.scaledPointerCoordinates(...this.selectionBox[0]),
+        // @ts-ignore
         this.scaledPointerCoordinates(...this.selectionBox[1]),
       ]
 
@@ -71,7 +73,9 @@ export default {
     },
 
     scaledPointerCoordinates(x: number, y: number): number[] {
+      // @ts-ignore
       const offsetLeft = this.$refs.overlay?.getBoundingClientRect().left || 0
+      // @ts-ignore
       const offsetTop = this.$refs.overlay?.getBoundingClientRect().top || 0
 
       return [
@@ -80,8 +84,20 @@ export default {
       ]
     },
 
-    setSelectionBoxCoordinates(event: MouseEvent) {
-      const coords = [event.clientX, event.clientY]
+    getXY(event: MouseEvent | TouchEvent): number[] {
+      if (event instanceof MouseEvent) {
+        return [event.clientX, event.clientY]
+      }
+
+      if (event instanceof TouchEvent) {
+        return [event.touches[0].clientX, event.touches[0].clientY]
+      }
+
+      return []
+    },
+
+    setSelectionBoxCoordinates(event: MouseEvent | TouchEvent) {
+      const coords = this.getXY(event)
       let newBox = JSON.parse(JSON.stringify(this.selectionBox)) as number[][]
 
       if (newBox.length === 1 || !newBox[1]) {
@@ -94,13 +110,13 @@ export default {
       this.selectionBox = newBox
     },
 
-    onOverlayDragStart(event: MouseEvent) {
+    onOverlayDragStart(event: MouseEvent | TouchEvent) {
       this.selectionBox = []
       this.setSelectionBoxCoordinates(event)
       this.overlayDragging = true
     },
 
-    onOverlayDragEnd(event: MouseEvent) {
+    onOverlayDragEnd(event: MouseEvent | TouchEvent) {
       if (this.selectionBox.length < 1) {
         this.selectionBox = []
         return
@@ -117,14 +133,16 @@ export default {
         this.$emit(
           'select',
           [
+            // @ts-ignore
             this.scaledPointerCoordinates(...this.selectionBox[0]),
+            // @ts-ignore
             this.scaledPointerCoordinates(...this.selectionBox[1])
           ]
         )
       }
     },
 
-    onOverlayMove(event: MouseEvent) {
+    onOverlayMove(event: MouseEvent | TouchEvent) {
       if (!this.overlayDragging || this.selectionBox.length < 1) {
         return
       }

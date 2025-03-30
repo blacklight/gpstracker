@@ -80,6 +80,7 @@ export default {
     $route(newRoute: { fullPath: string }, oldRoute: { fullPath: string }) {
       const oldQuery = this.parseQuery(oldRoute.fullPath)
       const newQuery = this.parseQuery(newRoute.fullPath)
+      // @ts-ignore
       if (this.isQueryChanged({oldValue: oldQuery, newValue: newQuery})) {
         this.query = newQuery
       }

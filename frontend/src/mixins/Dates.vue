@@ -22,7 +22,7 @@ export default {
       return new Date(Math.floor(date.getTime() / 60000) * 60000)
     },
 
-    toLocalString(date: Date | string | number | null): string {
+    toLocalString(date: Date | string | number | null | undefined): string {
       const d = this.normalizeDate(date)
       if (!d) {
         return ''
