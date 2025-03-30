@@ -2,13 +2,14 @@ class TimelineMetricsConfiguration {
   public altitude: boolean = false;
   public distance: boolean = true;
   public speed: boolean = false;
+  public battery: boolean = false;
 
   constructor(data: any | null = null) {
     if (!data) {
       return;
     }
 
-    for (const key of ['altitude', 'distance', 'speed']) {
+    for (const key of ['altitude', 'distance', 'speed', 'battery']) {
       const value = String(
         data[key] ?? data['show' + key.charAt(0).toUpperCase() + key.slice(1)]
       )
@@ -39,13 +40,16 @@ class TimelineMetricsConfiguration {
       case 'speed':
         this.speed = !this.speed;
         break;
+      case 'battery':
+        this.battery = !this.battery;
+        break;
       default:
         throw new TypeError(`Invalid timeline metric: ${metric}`);
     }
   }
 
   toQuery(): Record<string, string> {
-    return ['altitude', 'distance', 'speed'].reduce((acc: Record<string, string>, key: string) => {
+    return ['altitude', 'distance', 'speed', 'battery'].reduce((acc: Record<string, string>, key: string) => {
       acc['show' + key.charAt(0).toUpperCase() + key.slice(1)] = String((this as any)[key]);
       return acc;
     }, {});

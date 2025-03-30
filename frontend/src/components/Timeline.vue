@@ -21,6 +21,13 @@
                 :title="(showMetrics.speed ? 'Hide' : 'Show') + ' speed'">
           <font-awesome-icon icon="tachometer-alt" />
         </button>
+
+        <button @click="toggleMetric('battery')"
+                :class="{ selected: showMetrics.battery }"
+                :title="(showMetrics.battery ? 'Hide' : 'Show') + ' battery level'"
+                v-if="hasBatteryInfo">
+          <font-awesome-icon icon="battery-full" />
+        </button>
       </div>
 
       <div class="page-button-container">
@@ -128,12 +135,25 @@ export default {
       })
     },
 
+    hasBatteryInfo(): boolean {
+      return this.points.some((point: GPSPoint) => point.battery != null)
+    },
+
+    battery(): (number | null)[] {
+      return this.points
+        .map((point: GPSPoint) => point.battery ?? null)
+    },
+
     speed(): number[] {
       if (!this.points.length) {
         return []
       }
 
       return this.points.map((point: GPSPoint, index: number) => {
+        if (point.speed != null) {
+          return point.speed
+        }
+
         if (index === 0) {
           return 0
         }
@@ -181,6 +201,19 @@ export default {
             fill: false,
             data: this.speed,
             yAxisID: 'speed',
+          }
+        )
+      }
+
+      if (this.showMetrics.battery) {
+        datasets.push(
+          {
+            label: 'Battery (%)',
+            backgroundColor: '#0989f8',
+            borderColor: '#5959a8',
+            fill: false,
+            data: this.battery,
+            yAxisID: 'percentage',
           }
         )
       }
@@ -239,6 +272,31 @@ export default {
               },
             } : {}
           )
+        }
+      }
+
+      if (this.showMetrics.battery) {
+        let position = 'left'
+        if (yAxes.meters || yAxes.speed) {
+          position = 'right'
+        }
+
+        yAxes.percentage = {
+          type: 'linear',
+          position: position,
+          display: true,
+          min: 0,
+          max: 100,
+          ticks: {
+            beginAtZero: true,
+          },
+          title: {
+            display: true,
+            text: 'Percentage',
+          },
+          grid: {
+            drawOnChartArea: false,
+          },
         }
       }
 

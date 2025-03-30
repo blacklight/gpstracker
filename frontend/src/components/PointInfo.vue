@@ -55,7 +55,7 @@
           {{ device.name }}
         </p>
 
-        <p class="battery" :style="{ color: batteryColor }" v-if="point.battery">
+        <p class="battery" :style="{ color: batteryColor ?? 'initial' }" v-if="point.battery">
           <font-awesome-icon :icon="batteryIconClass" />
           <span>{{ point.battery }}%</span>
         </p>
