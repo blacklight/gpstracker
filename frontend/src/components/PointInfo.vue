@@ -55,6 +55,11 @@
           {{ device.name }}
         </p>
 
+        <p class="battery" :style="{ color: batteryColor }" v-if="point.battery">
+          <font-awesome-icon :icon="batteryIconClass" />
+          <span>{{ point.battery }}%</span>
+        </p>
+
         <p class="locality" v-if="point.locality">{{ point.locality }}</p>
         <p class="postal-code" v-if="point.postalCode">{{ point.postalCode }}</p>
         <p class="country" v-if="country">
@@ -105,6 +110,58 @@ export default {
   },
 
   computed: {
+    batteryColor() {
+      if (!this.point?.battery) {
+        return null;
+      }
+
+      if (this.point.battery > 75) {
+        return 'green';
+      }
+
+      if (this.point.battery > 66) {
+        return '#7DFF2F';
+      }
+
+      if (this.point.battery > 50) {
+        return '#D7D700';
+      }
+
+      if (this.point.battery > 25) {
+        return 'orange';
+      }
+
+      if (this.point.battery > 15) {
+        return '#FF4500';
+      }
+
+      return 'red';
+    },
+
+    batteryIconClass() {
+      if (!this.point?.battery) {
+        return null;
+      }
+
+      if (this.point.battery > 75) {
+        return 'fas fa-battery-full';
+      }
+
+      if (this.point.battery > 50) {
+        return 'fas fa-battery-three-quarters';
+      }
+
+      if (this.point.battery > 25) {
+        return 'fas fa-battery-half';
+      }
+
+      if (this.point.battery > 15) {
+        return 'fas fa-battery-quarter';
+      }
+
+      return 'fas fa-battery-empty';
+    },
+
     country() {
       const cc = this.point?.country as string | undefined
       if (cc?.length) {
@@ -284,6 +341,16 @@ export default {
     font-size: 0.9em;
     font-weight: bold;
     letter-spacing: 0.05em;
+  }
+
+  .battery {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+
+    span {
+      margin-left: 0.25em;
+    }
   }
 
   .timestamp {
