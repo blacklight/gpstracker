@@ -8,10 +8,50 @@ $breakpoints: (
 );
 
 // Mixin to print out media queries (based on map keys passed)
-@mixin media($keys...){
+@mixin media($keys...) {
   @each $key in $keys {
-    @media (min-width: map.get($breakpoints, $key)){
+    @media (min-width: map.get($breakpoints, $key)) {
       @content
     }
+  }
+}
+
+.hidden {
+  display: none !important;
+}
+
+@mixin from($key) {
+  @media (min-width: map.get($breakpoints, $key)) {
+    @content;
+  }
+}
+
+@mixin until($key) {
+  @media (max-width: #{map.get($breakpoints, $key) - 1}) {
+    @content;
+  }
+}
+
+.from.desktop {
+  @include until(desktop) {
+    display: none !important;
+  }
+}
+
+.from.tablet {
+  @include until(tablet) {
+    display: none !important;
+  }
+}
+
+.until.tablet {
+  @include from(tablet) {
+    display: none !important;
+  }
+}
+
+.until.desktop {
+  @include from(desktop) {
+    display: none !important;
   }
 }
