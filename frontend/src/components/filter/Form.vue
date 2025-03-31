@@ -13,7 +13,10 @@
 
     <div class="date-selectors" v-if="enableDateRange">
       <div class="date-selector">
-        <label for="start-date">Start Date</label>
+        <label for="start-date">
+          <font-awesome-icon icon="fas fa-calendar-day" />
+          Start Date
+        </label>
         <input type="datetime-local"
                id="start-date"
                name="start-date"
@@ -49,7 +52,10 @@
       </div>
 
       <div class="date-selector">
-        <label for="end-date">End Date</label>
+        <label for="end-date">
+          <font-awesome-icon icon="fas fa-calendar-day" />
+          End Date
+        </label>
         <input type="datetime-local"
                id="end-date"
                name="end-date"
@@ -85,9 +91,12 @@
       </div>
     </div>
 
-    <div class="pagination-container">
-      <div class="limit-container">
-        <label for="limit">Max Results</label>
+    <div class="form-row">
+      <div class="container limit-container">
+        <label for="limit">
+          <font-awesome-icon icon="fas fa-list-ol" />
+          Max Results
+        </label>
         <input type="number"
                id="limit"
                name="limit"
@@ -97,49 +106,58 @@
                :disabled="disabled"
                min="1" />
       </div>
+
+      <div class="container order-container">
+        <label for="order">
+          <font-awesome-icon icon="fas fa-sort" />
+          Order
+        </label>
+        <select id="order"
+                name="order"
+                v-model="newFilter.order"
+                :disabled="disabled">
+          <option value="asc">Oldest points first</option>
+          <option value="desc">Newest points first</option>
+        </select>
+      </div>
     </div>
 
-    <div class="order-container">
-      <label for="order">Order</label>
-      <select id="order"
-              name="order"
-              v-model="newFilter.order"
-              :disabled="disabled">
-        <option value="asc">Oldest points first</option>
-        <option value="desc">Newest points first</option>
-      </select>
-    </div>
+    <div class="form-row">
+      <div class="container resolution-container">
+        <label for="resolution">
+          <p class="title">
+            <font-awesome-icon icon="fas fa-ruler" />
+            Resolution (m)
+          </p>
 
-    <div class="resolution-container">
-      <label for="resolution">
-        <p class="title">
-          Resolution (m)
-        </p>
+          <p class="help">
+            Adjacent points will be at least this far apart.
+          </p>
+        </label>
 
-        <p class="help">
-          Adjacent points will be at least this far apart.
-        </p>
-      </label>
+        <input type="number"
+               id="resolution"
+               name="resolution"
+               :value="resolution"
+               :disabled="disabled"
+               @input="setResolution"
+               @change="setResolution"
+               min="0" />
+      </div>
 
-      <input type="number"
-             id="resolution"
-             name="resolution"
-             :value="resolution"
-             :disabled="disabled"
-             @input="setResolution"
-             @change="setResolution"
-             min="0" />
-    </div>
-
-    <div class="device-container">
-      <label for="device">Device</label>
-      <select id="device"
-              name="device"
-              v-model="newFilter.deviceId"
-              :disabled="disabled">
-        <option value="">All</option>
-        <option v-for="device in devices" :key="device.id" :value="device.id">{{ device.name }}</option>
-      </select>
+      <div class="container device-container">
+        <label for="device">
+          <font-awesome-icon icon="fas fa-mobile-alt" />
+          Device
+        </label>
+        <select id="device"
+                name="device"
+                v-model="newFilter.deviceId"
+                :disabled="disabled">
+          <option value="">All</option>
+          <option v-for="device in devices" :key="device.id" :value="device.id">{{ device.name }}</option>
+        </select>
+      </div>
     </div>
 
     <div class="footer">
@@ -394,17 +412,20 @@ export default {
     }
   }
 
-  .pagination-container {
+  .form-row {
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     margin: 0.5em;
 
-    .limit-container {
+    .container {
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 0 1em;
     }
 
     label {
@@ -414,6 +435,12 @@ export default {
     input {
       width: 100%;
     }
+  }
+
+  .limit-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .resolution-container {
