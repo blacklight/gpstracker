@@ -3,31 +3,24 @@
     <h1 v-if="loading">Loading...</h1>
     <h1 v-else-if="!points.length">No data to display</h1>
     <div class="body" v-else>
-      <div class="options">
-        <button @click="toggleMetric('altitude')"
-                :class="{ selected: showMetrics.altitude }"
-                :title="(showMetrics.altitude ? 'Hide' : 'Show') + ' altitude'">
-          <font-awesome-icon icon="mountain" />
+      <div class="options-toggle until tablet">
+        <button @click="optionsVisible = !optionsVisible"
+                :title="(optionsVisible ? 'Hide' : 'Show') + ' options'"
+                :class="{ selected: optionsVisible }">
+          <font-awesome-icon icon="bars" />
         </button>
+      </div>
 
-        <button @click="toggleMetric('distance')"
-                :class="{ selected: showMetrics.distance }"
-                :title="(showMetrics.distance ? 'Hide' : 'Show') + ' distance'">
-          <font-awesome-icon icon="ruler" />
-        </button>
+      <div class="options-container from tablet">
+        <TimelineOptions :showMetrics="showMetrics"
+                         :hasBatteryInfo="hasBatteryInfo"
+                         @show-metrics="$emit('show-metrics', $event)" />
+      </div>
 
-        <button @click="toggleMetric('speed')"
-                :class="{ selected: showMetrics.speed }"
-                :title="(showMetrics.speed ? 'Hide' : 'Show') + ' speed'">
-          <font-awesome-icon icon="tachometer-alt" />
-        </button>
-
-        <button @click="toggleMetric('battery')"
-                :class="{ selected: showMetrics.battery }"
-                :title="(showMetrics.battery ? 'Hide' : 'Show') + ' battery level'"
-                v-if="hasBatteryInfo">
-          <font-awesome-icon icon="battery-full" />
-        </button>
+      <div class="options-container until tablet" v-if="optionsVisible">
+        <TimelineOptions :showMetrics="showMetrics"
+                         :hasBatteryInfo="hasBatteryInfo"
+                         @show-metrics="$emit('show-metrics', $event)" />
       </div>
 
       <div class="page-button-container">
@@ -48,7 +41,7 @@
         </button>
       </div>
 
-      <div class="page-button-container"
+      <div class="page-button-container reset-pagination"
            v-if="locationQuery?.minId || locationQuery?.maxId">
         <button @click="$emit('reset-page')"
                 title="Reset pagination">
@@ -78,6 +71,7 @@ import Geo from '../mixins/Geo.vue';
 import GPSPoint from '../models/GPSPoint';
 import LocationQuery from '../models/LocationQuery';
 import TimelineMetricsConfiguration from '../models/TimelineMetricsConfiguration';
+import TimelineOptions from './TimelineOptions.vue';
 
 ChartJS.register(
   CategoryScale,
@@ -97,9 +91,11 @@ export default {
     'reset-page',
     'show-metrics',
   ],
+
   mixins: [Geo],
   components: {
     Line,
+    TimelineOptions,
   },
 
   props: {
@@ -118,6 +114,12 @@ export default {
       type: TimelineMetricsConfiguration,
       default: () => new TimelineMetricsConfiguration(),
     },
+  },
+
+  data() {
+    return {
+      optionsVisible: false,
+    }
   },
 
   computed: {
@@ -394,22 +396,18 @@ $options-width: 5em;
   }
 }
 
-.options {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  width: $options-width;
-  height: 100%;
-  margin-right: 1em;
+.options-toggle {
+  position: absolute;
+  width: 2em;
+  height: 2em;
+  z-index: 1;
 
   button {
     width: 100%;
-    height: 2.5em;
+    height: 100%;
     font-size: 1em;
-    background-color: var(--color-background);
-    border: 1px solid var(--vt-c-divider-light-1);
-    margin-left: 0.5em;
+    background-color: none;
+    border: 0;
     cursor: pointer;
 
     &:hover {
@@ -417,9 +415,25 @@ $options-width: 5em;
     }
 
     &.selected {
-      background: var(--vt-c-blue-bg-dark);
-      color: var(--vt-c-white);
+      color: var(--color-accent);
     }
+  }
+}
+
+.options-container {
+  width: $options-width;
+  height: 100%;
+  padding: 0.5em;
+
+  :deep(button) {
+    font-size: 0.8em;
+  }
+
+  &.until.tablet {
+    position: absolute;
+    left: 2.5em;
+    background-color: var(--color-background);
+    box-shadow: 0.25em 0.25em 0.5em 0.1em var(--color-border);
   }
 }
 
@@ -443,5 +457,13 @@ $options-width: 5em;
       color: var(--color-hover);
     }
   }
+}
+
+.reset-pagination {
+  width: 2em;
+  height: 2em;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 </style>
