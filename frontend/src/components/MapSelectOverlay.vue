@@ -26,6 +26,7 @@ export default {
 
   data() {
     return {
+      latestTouchEvent: null as TouchEvent | null,
       overlayDragging: false,
       selectionBox: [] as number[][],
     }
@@ -90,7 +91,13 @@ export default {
       }
 
       if (event instanceof TouchEvent) {
-        return [event.touches[0].clientX, event.touches[0].clientY]
+        const touches = event.touches?.length ? event.touches : this.latestTouchEvent?.touches
+        if (!touches?.length) {
+          return []
+        }
+
+        this.latestTouchEvent = null
+        return [touches[0].clientX, touches[0].clientY]
       }
 
       return []
@@ -148,6 +155,9 @@ export default {
       }
 
       this.setSelectionBoxCoordinates(event)
+      if (event instanceof TouchEvent) {
+        this.latestTouchEvent = event
+      }
     },
 
   }
