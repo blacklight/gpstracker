@@ -60,6 +60,12 @@
           <span>{{ point.battery }}%</span>
         </p>
 
+        <p class="accuracy" v-if="point.accuracy">
+          <font-awesome-icon icon="fas fa-ruler" />
+          <span class="title">Accuracy:</span>
+          <span class="value">{{ point.accuracy }} m</span>
+        </p>
+
         <p class="locality" v-if="point.locality">{{ point.locality }}</p>
         <p class="postal-code" v-if="point.postalCode">{{ point.postalCode }}</p>
         <p class="country" v-if="country">
@@ -350,6 +356,21 @@ export default {
 
     span {
       margin-left: 0.25em;
+    }
+  }
+
+  .accuracy {
+    font-size: 0.9em;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    opacity: 0.75;
+
+    .title {
+      margin: 0 0.25em;
+    }
+
+    .value {
+      font-weight: bold;
     }
   }
 

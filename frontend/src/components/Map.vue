@@ -32,6 +32,12 @@
           </div>
         </div>
 
+        <MapCircle v-if="selectedPoint?.accuracy != null && mapObj"
+                   :map="mapObj"
+                   :latitude="selectedPoint.latitude"
+                   :longitude="selectedPoint.longitude"
+                   :radius="selectedPoint.accuracy" />
+
         <PointInfo :point="selectedPoint"
                    :device="selectedPoint ? devicesById[selectedPoint?.deviceId] : null"
                    ref="popup"
@@ -94,7 +100,7 @@
 <script lang="ts">
 import _ from 'lodash';
 import Map from 'ol/Map';
-import Overlay from 'ol/Overlay';
+import MapCircle from './MapCircle.vue';
 import Point from 'ol/geom/Point';
 import PointInfo from './PointInfo.vue';
 import VectorLayer from 'ol/layer/Vector';
@@ -141,6 +147,7 @@ export default {
     FilterButton,
     FilterForm,
     FloatingButton,
+    MapCircle,
     MapSelectOverlay,
     PointInfo,
     Timeline,
@@ -154,7 +161,6 @@ export default {
       mapView: null as Optional<View>,
       pointToRemove: null as Optional<GPSPoint>,
       pointsLayer: null as Optional<VectorLayer>,
-      popup: null as Optional<Overlay>,
       refreshPoints: 0,
       routesLayer: null as Optional<VectorLayer>,
       selectedFeature: null as Optional<Feature>,
@@ -196,6 +202,14 @@ export default {
           acc[point.values_.id] = point
           return acc
         }, {})
+    },
+
+    mapObj(): Map | null {
+      if (!this.map) {
+        return null
+      }
+
+      return this.map as Map
     },
   },
 

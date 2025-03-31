@@ -2,9 +2,15 @@
 import GPSPoint from '../models/GPSPoint'
 
 export default {
+  data() {
+    return {
+      earthRadius: 6378e3, // metres
+    }
+  },
+
   methods: {
     latLngToDistance(p: GPSPoint, q: GPSPoint): number {
-      const R = 6371e3 // metres
+      const R = this.earthRadius // metres
       const φ1 = p.latitude * Math.PI / 180 // φ, λ in radians
       const φ2 = q.latitude * Math.PI / 180
       const Δφ = (q.latitude - p.latitude) * Math.PI / 180

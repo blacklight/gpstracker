@@ -164,7 +164,7 @@ export default {
       })
     },
 
-    graphData() {
+    graphData(): { labels: Date[], datasets: any[] } {
       const datasets = []
       if (this.showMetrics.altitude) {
         datasets.push(
