@@ -86,7 +86,7 @@ export default {
     },
 
     getXY(event: MouseEvent | TouchEvent): number[] {
-      let [x, y] = [null, null]
+      let [x, y] = [null, null] as [number | null, number | null]
       if (event instanceof TouchEvent) {
         if (event.touches?.length) {
           x = event.touches[0].clientX
@@ -98,7 +98,7 @@ export default {
           x = this.latestTouchEvent.changedTouches[0].clientX
           y = this.latestTouchEvent.changedTouches[0].clientY
         } else {
-          return
+          return []
         }
       } else {
         x = event.clientX
