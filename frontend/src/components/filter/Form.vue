@@ -131,7 +131,7 @@
           </p>
 
           <p class="help">
-            Adjacent points will be at least this far apart.
+            Adjacent points below this distance will be merged
           </p>
         </label>
 

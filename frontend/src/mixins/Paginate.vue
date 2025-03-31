@@ -32,8 +32,6 @@ export default {
         ...this.locationQuery,
         minId: undefined,
         maxId: this.oldestPoint.id,
-        // Previous page results should be retrieved in descending order
-        order: 'desc',
       })
     },
 
@@ -46,7 +44,6 @@ export default {
         ...this.locationQuery,
         minId: this.newestPoint.id,
         maxId: undefined,
-        order: 'asc',
       })
     },
   },
