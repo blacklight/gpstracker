@@ -18,9 +18,15 @@
             {{ point.latitude }}, {{ point.longitude }}
           </a>
         </p>
+
         <p class="altitude" v-if="point.altitude">
           <font-awesome-icon icon="fas fa-mountain" />
           {{ Math.round(point.altitude) }} m
+        </p>
+
+        <p class="speed" v-if="speedKmH != null">
+          <font-awesome-icon icon="fas fa-tachometer-alt" />
+          {{ speedKmH }} km/h
         </p>
 
         <form class="description editor" @submit.prevent="editPoint" v-if="editDescription">
@@ -185,6 +191,10 @@ export default {
       return `https://www.openstreetmap.org/?mlat=${this.point?.latitude}&mlon=${this.point?.longitude}`
     },
 
+    speedKmH(): number | null {
+      return this.point?.speed ? Math.round(this.point.speed * 3.6) : null
+    },
+
     timeString(): string | null {
       return this.formatDate(this.point?.timestamp)
     },
@@ -287,7 +297,7 @@ export default {
     pointer-events: none;
   }
 
-  p.latlng, p.altitude {
+  p.latlng, p.altitude, p.speed {
     font-size: 0.8em;
     margin: -0.25em 0 0.25em 0;
   }
