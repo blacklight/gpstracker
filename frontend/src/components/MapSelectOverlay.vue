@@ -6,13 +6,13 @@
     </div>
     <div class="overlay"
          ref="overlay"
-         @mousedown="onOverlayDragStart"
-         @mouseup="onOverlayDragEnd"
-         @mousemove="onOverlayMove"
-         @touchstart="onOverlayDragStart"
-         @touchend="onOverlayDragEnd"
-         @touchmove="onOverlayMove"
-         @click="onOverlayDragEnd">
+         @mousedown="onSelectionStart"
+         @mouseup="onSelectionEnd"
+         @mousemove="onSelectionEdit"
+         @touchstart.stop.prevent="onSelectionStart"
+         @touchend.stop.prevent="onSelectionEnd"
+         @touchmove.stop.prevent="onSelectionEdit"
+         @click="onSelectionEnd">
       <div class="box"
            :style="selectionBoxStyle"
            v-if="selectionBox.length > 1" />
@@ -86,21 +86,30 @@ export default {
     },
 
     getXY(event: MouseEvent | TouchEvent): number[] {
-      if (event instanceof MouseEvent) {
-        return [event.clientX, event.clientY]
-      }
-
+      let [x, y] = [null, null]
       if (event instanceof TouchEvent) {
-        const touches = event.touches?.length ? event.touches : this.latestTouchEvent?.touches
-        if (!touches?.length) {
-          return []
+        if (event.touches?.length) {
+          x = event.touches[0].clientX
+          y = event.touches[0].clientY
+        } else if (event.changedTouches?.length) {
+          x = event.changedTouches[0].clientX
+          y = event.changedTouches[0].clientY
+        } else if (this.latestTouchEvent) {
+          x = this.latestTouchEvent.changedTouches[0].clientX
+          y = this.latestTouchEvent.changedTouches[0].clientY
+        } else {
+          return
         }
-
-        this.latestTouchEvent = null
-        return [touches[0].clientX, touches[0].clientY]
+      } else {
+        x = event.clientX
+        y = event.clientY
       }
 
-      return []
+      if (x == null || y == null) {
+        return []
+      }
+
+      return [x, y]
     },
 
     setSelectionBoxCoordinates(event: MouseEvent | TouchEvent) {
@@ -117,13 +126,21 @@ export default {
       this.selectionBox = newBox
     },
 
-    onOverlayDragStart(event: MouseEvent | TouchEvent) {
+    onSelectionStart(event: MouseEvent | TouchEvent) {
       this.selectionBox = []
       this.setSelectionBoxCoordinates(event)
       this.overlayDragging = true
     },
 
-    onOverlayDragEnd(event: MouseEvent | TouchEvent) {
+    onSelectionEdit(event: MouseEvent | TouchEvent) {
+      if (!this.overlayDragging || this.selectionBox.length < 1) {
+        return
+      }
+
+      this.setSelectionBoxCoordinates(event)
+    },
+
+    onSelectionEnd(event: MouseEvent | TouchEvent) {
       if (this.selectionBox.length < 1) {
         this.selectionBox = []
         return
@@ -135,6 +152,7 @@ export default {
 
       this.setSelectionBoxCoordinates(event)
       this.overlayDragging = false
+      this.latestTouchEvent = null
 
       if (this.hasDistinctPoints) {
         this.$emit(
@@ -148,18 +166,6 @@ export default {
         )
       }
     },
-
-    onOverlayMove(event: MouseEvent | TouchEvent) {
-      if (!this.overlayDragging || this.selectionBox.length < 1) {
-        return
-      }
-
-      this.setSelectionBoxCoordinates(event)
-      if (event instanceof TouchEvent) {
-        this.latestTouchEvent = event
-      }
-    },
-
   }
 }
 </script>

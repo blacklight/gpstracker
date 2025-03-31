@@ -51,7 +51,7 @@
                         :devices="devices"
                         :disabled="loading"
                         :resolution="resolutionMeters"
-                        @refresh="locationQuery = $event"
+                        @refresh="onFormUpdate"
                         @set-resolution="setResolution" />
           </div>
           <FilterButton @input="showControls = !showControls"
@@ -284,7 +284,7 @@ export default {
         return
       }
 
-      this.locationQuery = nextPageQuery
+      this.locationQuery = new LocationQuery(nextPageQuery)
     },
 
     fetchPrevPage() {
@@ -293,7 +293,7 @@ export default {
         return
       }
 
-      this.locationQuery = prevPageQuery
+      this.locationQuery = new LocationQuery(prevPageQuery)
     },
 
     async resetPage() {
@@ -410,6 +410,10 @@ export default {
       this.locationQuery.maxId = null
     },
 
+    onFormUpdate(event: any) {
+      this.locationQuery = new LocationQuery(event)
+    },
+
     onTimelinePointHover(point: GPSPoint) {
       if (!this.pointsLayer) {
         return
@@ -450,7 +454,7 @@ export default {
         Math.max(startPoint[1], endPoint[1]),
       ]
 
-      this.locationQuery = {
+      this.locationQuery = new LocationQuery({
         ...this.locationQuery,
         startDate: null,
         endDate: null,
@@ -460,14 +464,14 @@ export default {
         minLatitude: startLat,
         maxLongitude: endLon,
         maxLatitude: endLat,
-      }
+      })
     },
 
     onSelectOverlayButtonClick() {
       if (!this.hasSelectionBox) {
         this.showSelectOverlay = true
       } else {
-        this.locationQuery = {
+        this.locationQuery = new LocationQuery({
           ...this.locationQuery,
           minId: null,
           maxId: null,
@@ -475,7 +479,7 @@ export default {
           minLatitude: null,
           maxLongitude: null,
           maxLatitude: null,
-        }
+        })
       }
     },
 
