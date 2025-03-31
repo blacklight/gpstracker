@@ -547,6 +547,8 @@ export default {
         ...this.showMetrics.toQuery(),
         resolutionMeters: this.resolutionMeters,
       })
+
+      this.refreshMap()
     },
 
     showMetrics: {
