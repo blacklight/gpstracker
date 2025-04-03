@@ -28,7 +28,7 @@ class Stats {
       })
     ).map(({dataValues: data}: any) =>
       new LocationStats({
-        key: Object.keys(data).reduce((acc, k) => {
+        key: groupBy.reduce((acc, k) => {
           acc[dbColumnsToProps[k] || k] = data[k];
           return acc;
         }, {} as Record<string, any>),
