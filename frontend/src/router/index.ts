@@ -4,6 +4,7 @@ import Devices from '../views/Devices.vue'
 import HomeView from '../views/HomeView.vue'
 import Login from '../views/Login.vue'
 import Logout from '../views/Logout.vue'
+import Stats from '../views/Stats.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +25,12 @@ const router = createRouter({
       path: '/api',
       name: 'api',
       component: API,
+    },
+
+    {
+      path: '/stats',
+      name: 'stats',
+      component: Stats,
     },
 
     {

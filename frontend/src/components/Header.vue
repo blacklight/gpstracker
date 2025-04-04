@@ -32,6 +32,13 @@
               </RouterLink>
             </DropdownItem>
 
+            <DropdownItem>
+              <RouterLink to="/stats">
+                <font-awesome-icon icon="chart-line" />&nbsp;&nbsp;
+                  <span class="item-text">Statistics</span>
+              </RouterLink>
+            </DropdownItem>
+
             <DropdownItem @click="$emit('logout')">
               <font-awesome-icon icon="sign-out-alt" />&nbsp;&nbsp;
               <span class="item-text">Logout</span>

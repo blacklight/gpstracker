@@ -1,12 +1,27 @@
 <script lang="ts">
 export default {
   methods: {
-    formatDate(date: Date | number | string | null | undefined): string {
+    formatDate(date: Date | number | string | null | undefined, opts: {
+      dayOfWeek?: boolean,
+      seconds?: boolean,
+    } = {
+      dayOfWeek: true,
+      seconds: true,
+    }): string {
       if (!date) {
         return '-'
       }
 
-      return new Date(date).toString().replace(/GMT.*/, '')
+      let dateStr = this.normalizeDate(date).toString().replace(/GMT.*/, '').trim() as string
+      if (!opts.dayOfWeek) {
+        dateStr = dateStr.slice(4)
+      }
+
+      if (!opts.seconds) {
+        dateStr = dateStr.slice(0, -3)
+      }
+
+      return dateStr
     },
 
     normalizeDate(date: any): Date | null {
