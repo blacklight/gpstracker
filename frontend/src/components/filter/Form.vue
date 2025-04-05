@@ -172,7 +172,7 @@
           name="country"
           placeholder="Filter by country"
           allow-only-values
-          v-model="newFilter.country"
+          :value="newFilter.country || ''"
           :values="autocompleteCountries"
           :disabled="disabled"
           @input="newFilter.country = $event" />

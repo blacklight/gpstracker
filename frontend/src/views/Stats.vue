@@ -31,11 +31,21 @@
           <tbody>
             <tr v-for="stat, i in stats" :key="i">
               <td class="key" v-for="value, attr in stat.key" :key="attr">
-                {{ displayValue(attr, value) }}
+                <a :href="mapURL(stat, { ascending: false })">
+                  {{ displayValue(attr, value) }}
+                </a>
               </td>
               <td class="count">{{ stat.count }}</td>
-              <td class="date">{{ displayDate(stat.startDate) }}</td>
-              <td class="date">{{ displayDate(stat.endDate) }}</td>
+              <td class="date">
+                <a :href="mapURL(stat, { ascending: true })">
+                  {{ displayDate(stat.startDate) }}
+                </a>
+              </td>
+              <td class="date">
+                <a :href="mapURL(stat, { ascending: true })">
+                  {{ displayDate(stat.endDate) }}
+                </a>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -127,6 +137,16 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+
+    mapURL(stat: LocationStats, opts: {
+      ascending?: boolean,
+    }): string {
+      const key = Object.entries(stat.key)
+        .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+        .join('&');
+
+      return `/#${key}&order=${opts.ascending ? 'asc' : 'desc'}`
     },
 
     setURLQuery() {
@@ -295,6 +315,10 @@ export default {
 
           &.date {
             opacity: 0.6;
+          }
+
+          a {
+            color: var(--color-accent);
           }
         }
       }
