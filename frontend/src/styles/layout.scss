@@ -16,6 +16,23 @@ $breakpoints: (
   }
 }
 
+// Generate col-<breakpoint>-<number> classes
+$screen-size-to-breakpoint: (
+  s:mobile,
+  m:tablet,
+  l:desktop
+);
+
+@for $i from 1 through 12 {
+  @each $screen-size, $breakpoint in $screen-size-to-breakpoint {
+    .col-#{$screen-size}-#{$i} {
+      @media (min-width: map.get($breakpoints, $breakpoint)) {
+        width: (100% / 12) * $i;
+      }
+    }
+  }
+}
+
 .hidden {
   display: none !important;
 }

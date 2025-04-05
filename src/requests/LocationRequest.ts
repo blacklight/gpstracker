@@ -58,7 +58,7 @@ class LocationRequest {
     this.initNumber('maxLatitude', req, parseFloat);
     this.initNumber('minLongitude', req, parseFloat);
     this.initNumber('maxLongitude', req, parseFloat);
-    this.country = req.country;
+    this.country = req.country?.toLowerCase();
     this.locality = req.locality;
     this.postalCode = req.postalCode;
     this.description = req.description;
