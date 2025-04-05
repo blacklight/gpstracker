@@ -12,7 +12,12 @@ export default {
         return '-'
       }
 
-      let dateStr = this.normalizeDate(date).toString().replace(/GMT.*/, '').trim() as string
+      date = this.normalizeDate(date)
+      if (!date) {
+        return '-'
+      }
+
+      let dateStr = date.toString().replace(/GMT.*/, '').trim() as string
       if (!opts.dayOfWeek) {
         dateStr = dateStr.slice(4)
       }

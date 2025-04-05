@@ -159,7 +159,7 @@ export default {
 
   data() {
     return {
-      countries: [] as string[],
+      countries: [] as Country[],
       devices: [] as UserDevice[],
       loading: false,
       map: null as Optional<Map>,
@@ -307,10 +307,11 @@ export default {
       await this.processQueryChange(this.locationQuery, oldQuery)
     },
 
-    async getCountries() {
+    async getCountries(): Promise<Country[]> {
       return (
         await this.getStats(
           new StatsRequest({
+            // @ts-ignore
             userId: this.$root.user.id,
             groupBy: ['country'],
             order: 'desc',

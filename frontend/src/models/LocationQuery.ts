@@ -15,6 +15,8 @@ class LocationQuery {
   public country: Optional<string> = null;
   public locality: Optional<string> = null;
   public postalCode: Optional<string> = null;
+  public address: Optional<string> = null;
+  public description: Optional<string> = null;
   public order: string = 'desc';
 
   constructor(data: {
@@ -32,6 +34,8 @@ class LocationQuery {
     country?: Optional<string>;
     locality?: Optional<string>;
     postalCode?: Optional<string>;
+    address?: Optional<string>;
+    description?: Optional<string>;
     order?: Optional<string>;
   }) {
     this.limit = data.limit || this.limit;
@@ -48,6 +52,8 @@ class LocationQuery {
     this.country = data.country || this.country;
     this.locality = data.locality || this.locality;
     this.postalCode = data.postalCode || this.postalCode;
+    this.address = data.address || this.address;
+    this.description = data.description || this.description;
     this.order = data.order || this.order;
   }
 }

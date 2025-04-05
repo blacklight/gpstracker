@@ -1,10 +1,16 @@
 <template>
   <div class="stats view">
     <div class="wrapper">
-      <h1>
-        <font-awesome-icon icon="chart-line" />&nbsp;
-        Statistics
-      </h1>
+      <div class="header">
+        <h1>
+          <font-awesome-icon icon="chart-line" />&nbsp;
+          Statistics
+        </h1>
+
+        <small v-if="stats.length">
+          Showing <b>{{ stats.length }}</b> records
+        </small>
+      </div>
 
       <div class="loading-container" v-if="loading">
         <Loading />
@@ -23,7 +29,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="stat in stats" :key="stat.key">
+            <tr v-for="stat, i in stats" :key="i">
               <td class="key" v-for="value, attr in stat.key" :key="attr">
                 {{ displayValue(attr, value) }}
               </td>
@@ -61,10 +67,8 @@
 </template>
 
 <script lang="ts">
-import { getCountryData, getEmojiFlag } from 'countries-list';
-import type { TCountryCode } from 'countries-list';
-
 import Api from '../mixins/Api.vue';
+import Country from '../models/Country';
 import Dates from '../mixins/Dates.vue';
 import FloatingButton from '../elements/FloatingButton.vue';
 import Loading from '../elements/Loading.vue';
@@ -106,6 +110,7 @@ export default {
   computed: {
     query() {
       return new StatsRequest({
+        // @ts-ignore
         userId: this.$root.user.id,
         groupBy: Object.entries(this.metrics)
           .filter(([_, enabled]) => enabled)
@@ -158,7 +163,13 @@ export default {
         }
       }
 
-      this.metrics = metrics;
+      this.metrics = metrics as {
+        country: boolean,
+        locality: boolean,
+        address: boolean,
+        postalCode: boolean,
+        description: boolean,
+      };
     },
 
     closeForm() {
@@ -166,7 +177,14 @@ export default {
     },
 
     onMetricsSubmit(newMetrics: Record<string, boolean>) {
-      this.metrics = newMetrics;
+      this.metrics = newMetrics as {
+        country: boolean,
+        locality: boolean,
+        address: boolean,
+        postalCode: boolean,
+        description: boolean,
+      };
+
       this.closeForm();
     },
 
@@ -187,13 +205,12 @@ export default {
         return "<missing>";
       }
 
-      const cc = countryCode.toUpperCase() as TCountryCode;
-      const country = getCountryData(cc);
+      const country = Country.fromCode(countryCode);
       if (!country) {
         return countryCode;
       }
 
-      return `${getEmojiFlag(cc)} ${country.name}`;
+      return `${country.flag} ${country.name}`;
     },
 
     displayDate(date: Date | string | number | null | undefined) {
@@ -208,14 +225,6 @@ export default {
         this.refresh();
       },
       deep: true,
-    },
-
-    showSelectForm(newValue: boolean) {
-      if (newValue) {
-        this.$nextTick(() => {
-          this.$refs.metricsForm?.focus();
-        });
-      }
     },
   },
 
@@ -250,6 +259,26 @@ export default {
 
     h1 {
       margin-bottom: 1rem;
+    }
+  }
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    small {
+      margin: -1em 0 1em 0;
+      opacity: 0.6;
+    }
+  }
+
+  .list {
+    .no-data {
+      font-size: 1.2rem;
+      margin: 1rem;
+      text-align: center;
     }
   }
 

@@ -2,13 +2,13 @@
   <form class="metrics-form" @submit.prevent="$emit('submit', newMetrics)">
     <div class="metrics">
       <div v-for="enabled, metric in newMetrics" :key="metric" class="metric">
-        <label :for="metric">
+        <label :for="metric.toString()">
           <input
             type="checkbox"
-            :id="metric"
-            v-model="newMetrics[metric]"
+            :id="metric.toString()"
+            v-model="newMetrics[metric.toString()]"
           />&nbsp;
-          {{ displayName(metric) }}
+          {{ displayName(metric.toString()) }}
         </label>
       </div>
     </div>

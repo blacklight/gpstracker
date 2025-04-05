@@ -27,7 +27,7 @@ $screen-size-to-breakpoint: (
   @each $screen-size, $breakpoint in $screen-size-to-breakpoint {
     .col-#{$screen-size}-#{$i} {
       @media (min-width: map.get($breakpoints, $breakpoint)) {
-        width: (100% / 12) * $i;
+        width: calc((100% / 12) * $i);
       }
     }
   }
