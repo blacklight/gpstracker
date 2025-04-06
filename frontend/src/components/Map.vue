@@ -216,6 +216,13 @@ export default {
 
       return this.map as Map
     },
+
+    pointsById(): Record<string, GPSPoint> {
+      return this.gpsPoints.reduce((acc: Record<string, GPSPoint>, point: GPSPoint) => {
+        acc[point.id] = point
+        return acc
+      }, {})
+    },
   },
 
   methods: {
@@ -415,6 +422,7 @@ export default {
           ...this.locationQuery,
           ...this.showMetrics.toQuery(),
           resolutionMeters: this.resolutionMeters,
+          selectedId: urlQuery.selectedId,
         }
       )
     },
@@ -519,6 +527,7 @@ export default {
             ...newQuery,
             ...this.showMetrics.toQuery(),
             resolutionMeters: this.resolutionMeters,
+            selectedId: this.selectedPoint?.id,
           }
         )
 
@@ -549,6 +558,24 @@ export default {
           this.refreshMap()
         }
       },
+
+      initSelectedPoint() {
+        const query = this.parseQuery(window.location.href)
+        if (query.selectedId) {
+          const point = this.pointsById[query.selectedId]
+          if (point) {
+            this.selectPoint(point)
+            // @ts-ignore
+            this.$refs.popup.setPosition([point.longitude, point.latitude])
+            this.map?.getView().setCenter([point.longitude, point.latitude])
+          }
+        }
+
+        this.setQuery({
+          ...query,
+          selectedId: this.selectedPoint?.id,
+        })
+      },
   },
 
   watch: {
@@ -567,21 +594,29 @@ export default {
     },
 
     resolutionMeters() {
+      const urlQuery = this.parseQuery(window.location.href)
       this.setQuery({
-        ...this.locationQuery,
-        ...this.showMetrics.toQuery(),
+        ...urlQuery,
         resolutionMeters: this.resolutionMeters,
       })
 
       this.refreshMap()
     },
 
+    selectedPoint() {
+      const urlQuery = this.parseQuery(window.location.href)
+      this.setQuery({
+        ...urlQuery,
+        selectedId: this.selectedPoint?.id,
+      })
+    },
+
     showMetrics: {
       handler() {
+        const urlQuery = this.parseQuery(window.location.href)
         this.setQuery({
-          ...this.locationQuery,
+          ...urlQuery,
           ...this.showMetrics.toQuery(),
-          resolutionMeters: this.resolutionMeters,
         })
       },
       deep: true,
@@ -590,13 +625,16 @@ export default {
 
   async mounted() {
     this.initQuery();
-    [this.gpsPoints, this.devices] = await Promise.all([
+    [this.gpsPoints, this.devices, this.countries] = await Promise.all([
       this.fetch(),
       this.getMyDevices(),
+      this.getCountries(),
     ])
 
     this.map = this.createMap()
-    this.countries = await this.getCountries()
+    setTimeout(() => {
+      this.initSelectedPoint()
+    }, 1000)
   },
 }
 </script>
