@@ -6,6 +6,10 @@
 
 <!-- toc -->
 
+- [Features](#features)
+  * [History navigation](#history-navigation)
+  * [Select location points by area](#select-location-points-by-area)
+  * [Advanced statistics](#advanced-statistics)
 - [Configuration](#configuration)
 - [Docker installation](#docker-installation)
 - [Local installation](#local-installation)
@@ -35,6 +39,41 @@ GPSTracker is a simple Webapp that consists of:
 It is meant as a self-hosted and privacy-aware alternative to services like Google Maps Timeline.
 
 ![Screenshot of GPSTracker](https://static.platypush.tech/screenshots/gpstracker_screenshot.jpg)
+
+## Features
+
+### History navigation
+
+At its core GPSTracker allows you to easily navigate through your stored
+location data, offering pagination, advanced filtering and sorting.
+
+The timeline allows an easy time-based navigation, and it also reports
+information such as the total distance traveled, the altitude, the speed and the
+battery level at the time of the location point.
+
+![GPSTracker history
+navigation](https://static.platypush.tech/screenshots/gpstracker-history-navigation.gif)
+
+![GPSTracker map
+filter](https://static.platypush.tech/screenshots/gpstracker-map-filter.jpg)
+
+### Select location points by area
+
+You can select a specific area on the map and filter the location points by it,
+providing easy answers to questions such as "where have I been in this specific
+location in the last year?".
+
+![GPSTracker history
+navigation](https://static.platypush.tech/screenshots/gpstracker-select-location-by-area.gif)
+
+### Advanced statistics
+
+More advanced statistics are available in the _Stats_ page, which allows you to
+aggregate your location data by any combinations of the available metrics and
+explore specific location points in a certain group.
+
+![GPSTracker stats
+panel](https://static.platypush.tech/screenshots/gpstracker-stats.gif)
 
 ## Configuration
 
