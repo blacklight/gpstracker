@@ -13,6 +13,7 @@ class LocationRequest {
   offset: Optional<number> = null;
   startDate: Optional<Date> = null;
   endDate: Optional<Date> = null;
+  ids: Optional<number[]> = null;
   minId: Optional<number> = null;
   maxId: Optional<number> = null;
   minLatitude: Optional<number> = null;
@@ -33,6 +34,7 @@ class LocationRequest {
     offset?: number;
     startDate?: Date;
     endDate?: Date;
+    ids?: number[] | string;
     minId?: number;
     maxId?: number;
     minLatitude?: number;
@@ -64,6 +66,15 @@ class LocationRequest {
     this.description = req.description;
     this.orderBy = req.orderBy || this.orderBy;
     this.order = (req.order || this.order).toUpperCase() as Order;
+
+    const ids = typeof req.ids === 'string' ? req.ids.split(/\s*,\s*/) : req.ids;
+    this.ids = (ids || []).map((id: any) => {
+      const numId = parseInt(id);
+      if (isNaN(numId)) {
+        throw new ValidationError(`Invalid value for ids: ${id}`);
+      }
+      return numId;
+    });
   }
 
   private initNumber(key: string, req: any, parser: (s: string) => number = parseInt): void {
@@ -88,6 +99,16 @@ class LocationRequest {
   public toMap(db: Db): any {
     let queryMap: any = {};
     const where: any = {};
+
+    if (this.ids?.length) {
+      queryMap.where = {
+        [db.locationTableColumns.id || 'id']: {[Op.in]: this.ids},
+      };
+
+      queryMap.order = [[db.locationTableColumns.timestamp || 'timestamp', this.order.toUpperCase()]];
+      // If we have ids, we don't need any other filters
+      return queryMap;
+    }
 
     if (this.limit != null) {
       queryMap.limit = this.limit;

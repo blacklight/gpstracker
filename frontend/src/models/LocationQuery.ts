@@ -6,6 +6,7 @@ class LocationQuery {
   public deviceId: Optional<string> = null;
   public startDate: Optional<Date> = null;
   public endDate: Optional<Date> = null;
+  public ids: Optional<number[]> = null;
   public minId: Optional<number> = null;
   public maxId: Optional<number> = null;
   public minLatitude: Optional<number> = null;
@@ -25,6 +26,7 @@ class LocationQuery {
     deviceId?: Optional<string>;
     startDate?: Optional<Date>;
     endDate?: Optional<Date>;
+    ids?: Optional<number[] | string>;
     minId?: Optional<number>;
     maxId?: Optional<number>;
     minLatitude?: Optional<number>;
@@ -43,6 +45,7 @@ class LocationQuery {
     this.deviceId = data.deviceId || this.deviceId;
     this.startDate = data.startDate || this.startDate;
     this.endDate = data.endDate || this.endDate;
+    this.ids = data.ids ? (Array.isArray(data.ids) ? data.ids : data.ids.split(/\s*,\s*/).map(Number)) : this.ids;
     this.minId = data.minId || this.minId;
     this.maxId = data.maxId || this.maxId;
     this.minLatitude = data.minLatitude || this.minLatitude;

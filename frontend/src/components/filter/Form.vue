@@ -241,6 +241,26 @@
                v-model="newFilter.description"
                :disabled="disabled" />
       </div>
+
+      <div class="container ids-container">
+        <label for="ids">
+          <p class="title">
+          <font-awesome-icon icon="fas fa-tag" />
+            Point IDs
+          </p>
+
+          <p class="help">
+            Comma-separated list of point IDs to filter by
+          </p>
+        </label>
+
+        <input type="text"
+               id="ids"
+               name="ids"
+               placeholder="Filter by point IDs"
+               v-model="newFilter.ids"
+               :disabled="disabled" />
+      </div>
     </main>
 
     <footer>
@@ -514,6 +534,10 @@ $footer-height: 3.5em;
 
       @include from(tablet) {
         width: 50%;
+      }
+
+      .title {
+        text-align: center;
       }
 
       label {
