@@ -24,7 +24,7 @@ class Stats {
               .map((d) => d.dataValues.id)
         },
         group: groupBy,
-        order: [[Sequelize.fn('COUNT', Sequelize.col($db.locationTableColumns.id)), req.order]],
+        order: [[req.orderBy, req.order]],
       })
     ).map(({dataValues: data}: any) =>
       new LocationStats({

@@ -20,12 +20,24 @@
         <table class="table" v-if="stats.length">
           <thead>
             <tr>
-              <th class="key" v-for="attr in Object.keys(stats[0].key)" :key="attr">
-                {{ displayName(attr) }}
+              <th class="key"
+                  @click="onColumnHeadClick(attr)"
+                  v-for="attr in Object.keys(stats[0].key)"
+                  :key="attr">
+                <font-awesome-icon v-if="orderBy === attr"
+                  :icon="['fas', order === 'asc' ? 'sort-up' : 'sort-down']" />
+                <font-awesome-icon icon="fas fa-sort" v-else />
+                &nbsp;{{ displayName(attr) }}
               </th>
-              <th class="count"># of records</th>
-              <th class="date">First record</th>
-              <th class="date">Last record</th>
+              <th :class="column.className"
+                  @click="onColumnHeadClick(columnName)"
+                  v-for="column, columnName in columns"
+                  :key="columnName">
+                <font-awesome-icon v-if="orderBy === columnName"
+                  :icon="['fas', order === 'asc' ? 'sort-up' : 'sort-down']" />
+                <font-awesome-icon icon="fas fa-sort" v-else />
+                &nbsp;{{ column.displayName }}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -104,6 +116,20 @@ export default {
 
   data() {
     return {
+      columns: {
+        count: {
+          displayName: '# of records',
+          className: 'count',
+        },
+        startDate: {
+          displayName: 'First record',
+          className: 'date',
+        },
+        endDate: {
+          displayName: 'Last record',
+          className: 'date',
+        },
+      },
       loading: false,
       metrics: {
         country: true,
@@ -112,6 +138,8 @@ export default {
         postalCode: false,
         description: false,
       },
+      order: 'desc',
+      orderBy: 'count',
       showSelectForm: false,
       stats: [] as LocationStats[],
     }
@@ -122,10 +150,33 @@ export default {
       return new StatsRequest({
         // @ts-ignore
         userId: this.$root.user.id,
+        order: this.order,
+        orderBy: this.orderBy,
         groupBy: Object.entries(this.metrics)
           .filter(([_, enabled]) => enabled)
           .map(([metric]) => metric),
       })
+    },
+
+    urlQuery() {
+      return Object.entries(this.query)
+        .map(([key, value]) => {
+          if (key === 'userId') {
+            return ''
+          }
+
+          if (key === 'groupBy') {
+            return `${key}=${(value as string[]).sort().join(',')}`;
+          }
+
+          if (key === 'order') {
+            value = (value as string)?.toLowerCase();
+          }
+
+          return `${key}=${encodeURIComponent(value as any)}`
+        })
+        .filter((param: string) => param.length)
+        .join('&');
     },
   },
 
@@ -149,16 +200,14 @@ export default {
       return `/#${key}&order=${opts.ascending ? 'asc' : 'desc'}`
     },
 
-    setURLQuery() {
-      const enabledMetrics = Object.entries(this.metrics)
-        .filter(([_, enabled]) => enabled)
-        .map(([metric]) => metric);
-
+    async setURLQuery() {
       window.history.replaceState(
         window.history.state,
         '',
-        `${window.location.pathname}#groupBy=${enabledMetrics.sort().join(',')}`,
+        `${window.location.pathname}#${this.urlQuery}`,
       );
+
+      await this.refresh();
     },
 
     setState() {
@@ -183,6 +232,9 @@ export default {
         }
       }
 
+      this.orderBy = params.get('orderBy') || 'count';
+      this.order = params.get('order') || 'desc';
+
       this.metrics = metrics as {
         country: boolean,
         locality: boolean,
@@ -206,6 +258,15 @@ export default {
       };
 
       this.closeForm();
+    },
+
+    onColumnHeadClick(attr: string) {
+      if (this.orderBy === attr) {
+        this.order = this.order === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.orderBy = attr;
+        this.order = attr === 'count' ? 'desc' : 'asc';
+      }
     },
 
     displayValue(key: string, value: any) {
@@ -242,16 +303,26 @@ export default {
     query: {
       handler() {
         this.setURLQuery();
-        this.refresh();
       },
       deep: true,
+    },
+
+    orderBy: {
+      handler() {
+        this.setURLQuery();
+      },
+    },
+
+    order: {
+      handler() {
+        this.setURLQuery();
+      },
     },
   },
 
   async created() {
     this.setState();
-    this.setURLQuery();
-    await this.refresh();
+    await this.setURLQuery();
   },
 }
 </script>
@@ -303,6 +374,18 @@ export default {
   }
 
   table {
+    thead {
+      th {
+        margin: 0 auto;
+        cursor: pointer;
+
+        &:hover {
+          background-color: var(--color-accent);
+          color: var(--color-background);
+        }
+      }
+    }
+
     tbody {
       tr {
         td {
