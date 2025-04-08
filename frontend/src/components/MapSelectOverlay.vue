@@ -87,7 +87,7 @@ export default {
 
     getXY(event: any): number[] {
       let [x, y] = [null, null] as [number | null, number | null]
-      if (event instanceof window.TouchEvent) {
+      if (window.TouchEvent && event instanceof window.TouchEvent) {
         if (event.touches?.length) {
           x = event.touches[0].clientX
           y = event.touches[0].clientY
