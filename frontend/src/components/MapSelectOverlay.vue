@@ -26,7 +26,7 @@ export default {
 
   data() {
     return {
-      latestTouchEvent: null as TouchEvent | null,
+      latestTouchEvent: null as any,
       overlayDragging: false,
       selectionBox: [] as number[][],
     }
@@ -85,9 +85,9 @@ export default {
       ]
     },
 
-    getXY(event: MouseEvent | TouchEvent): number[] {
+    getXY(event: any): number[] {
       let [x, y] = [null, null] as [number | null, number | null]
-      if (event instanceof TouchEvent) {
+      if (event instanceof window.TouchEvent) {
         if (event.touches?.length) {
           x = event.touches[0].clientX
           y = event.touches[0].clientY
@@ -112,7 +112,7 @@ export default {
       return [x, y]
     },
 
-    setSelectionBoxCoordinates(event: MouseEvent | TouchEvent) {
+    setSelectionBoxCoordinates(event: any) {
       const coords = this.getXY(event)
       let newBox = JSON.parse(JSON.stringify(this.selectionBox)) as number[][]
 
@@ -126,13 +126,13 @@ export default {
       this.selectionBox = newBox
     },
 
-    onSelectionStart(event: MouseEvent | TouchEvent) {
+    onSelectionStart(event: any) {
       this.selectionBox = []
       this.setSelectionBoxCoordinates(event)
       this.overlayDragging = true
     },
 
-    onSelectionEdit(event: MouseEvent | TouchEvent) {
+    onSelectionEdit(event: any) {
       if (!this.overlayDragging || this.selectionBox.length < 1) {
         return
       }
@@ -140,7 +140,7 @@ export default {
       this.setSelectionBoxCoordinates(event)
     },
 
-    onSelectionEnd(event: MouseEvent | TouchEvent) {
+    onSelectionEnd(event: any) {
       if (this.selectionBox.length < 1) {
         this.selectionBox = []
         return
