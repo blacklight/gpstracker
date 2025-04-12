@@ -18,6 +18,7 @@
 - [Usage](#usage)
   * [Initial setup](#initial-setup)
   * [Ingestion](#ingestion)
+    + [Enriching location data](#enriching-location-data)
   * [External data sources](#external-data-sources)
 - [Development](#development)
   * [Compile and Hot-Reload for Development](#compile-and-hot-reload-for-development)
@@ -172,6 +173,33 @@ Or, for more advanced use cases, you can use a general-purpose application like
 [AutoLocation](https://play.google.com/store/apps/details?id=com.joaomgcd.autolocation)
 to send data to the endpoint, or decouple the ingestion from the frontend by
 using an intermediate MQTT or Kafka broker.
+
+#### Enriching location data
+
+If the ingested location data does not contain the `address`, `locality`,
+`country` or `postalCode` fields, and you have set the `GEOCODE_PROVIDER`
+environment variable, then the application will try to geocode the location
+upon ingestion using the configured geocoding provider. Supported providers:
+
+- [`nominatim`](https://nominatim.org/)
+  - It uses OpenStreetMap data ([usage
+    policy](https://operations.osmfoundation.org/policies/nominatim/)).
+  - It doesn't require an API key, but it is rate-limited to 1 request per
+    second (not advised if you are ingesting bulk data if you use the
+    default `NOMINATIM_URL` instance).
+  - It supports a custom `NOMINATIM_URL` environment variable to use a custom
+    Nominatim instance.
+- [`google`](https://developers.google.com/maps/documentation/geocoding/start)
+  - It requires a Google Maps API key, set in the `GOOGLE_API_KEY` environment
+    variable.
+  - See [additional usage
+    limits](https://developers.google.com/maps/documentation/geocoding/usage-and-billing)
+    for details. You can set your own usage limits in the Google Cloud
+    console, but keep in mind that above a certain threshold you will be
+    charged.
+
+If `GEOCODE_PROVIDER` is not set, the application will not attempt to geocode
+the location data upon ingestion.
 
 ### External data sources
 

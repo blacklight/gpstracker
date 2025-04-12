@@ -2,15 +2,18 @@ class Secrets {
   public readonly serverKey: string;
   public readonly adminPassword: string;
   public readonly adminEmail: string;
+  public readonly googleApiKey?: string;
 
-  private constructor({
-    serverKey,
-    adminPassword,
-    adminEmail,
-  }: any) {
-    this.serverKey = serverKey;
-    this.adminPassword = adminPassword;
-    this.adminEmail = adminEmail;
+  private constructor(args: {
+    serverKey: string;
+    adminPassword: string;
+    adminEmail: string;
+    googleApiKey?: string;
+  }) {
+    this.serverKey = args.serverKey;
+    this.adminPassword = args.adminPassword;
+    this.adminEmail = args.adminEmail;
+    this.googleApiKey = args.googleApiKey;
   }
 
   public static fromEnv(): Secrets {
@@ -33,6 +36,7 @@ class Secrets {
       serverKey: process.env.SERVER_KEY,
       adminPassword: process.env.ADMIN_PASSWORD,
       adminEmail: process.env.ADMIN_EMAIL,
+      googleApiKey: process.env.GOOGLE_API_KEY,
     });
   }
 }

@@ -2,6 +2,7 @@ import Auth from "./Auth";
 import Devices from "./Devices";
 import DevicesById from "./DevicesById";
 import GPSData from "./GPSData";
+import LocationInfo from "./LocationInfo";
 import Routes from "../../Routes";
 import Stats from "./Stats";
 import Tokens from "./Tokens";
@@ -14,6 +15,7 @@ class ApiV1Routes extends Routes {
     new Devices(),
     new DevicesById(),
     new GPSData(),
+    new LocationInfo(),
     new Stats(),
     new Tokens(),
     new TokensById(),

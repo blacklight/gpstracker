@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import { authenticate } from '../../../auth';
 import { AuthInfo } from '../../../auth';
+import { LocationInfoProvider } from '../../../ext/location';
 import { LocationRequest } from '../../../requests';
 import { Optional } from '../../../types';
 import { GPSPoint, RoleName } from '../../../models';
@@ -21,6 +22,30 @@ class GPSData extends ApiV1Route {
       authenticate([RoleName.Admin]);
     }
   };
+
+  private enrichWithLocationInfo = async (gpsData: GPSPoint[]) => {
+    const provider = LocationInfoProvider.get();
+    if (!provider) {
+      return gpsData;
+    }
+
+    return await Promise.all(
+      gpsData
+        .map(async (point) => {
+          // Only enrich points that have latitude and longitude, but no
+          // location info
+          if (
+            !(point.latitude && point.longitude) ||
+            (point.country && point.locality && point.address)
+          ) {
+            return point;
+          }
+
+          const locationInfo = await provider.getLocationInfo(point);
+          return { ...point, ...locationInfo };
+        })
+    );
+  }
 
   @authenticate()
   get = async (req: Request, res: Response, auth: Optional<AuthInfo>) => {
@@ -44,7 +69,10 @@ class GPSData extends ApiV1Route {
   post = async (req: Request, res: Response, auth: Optional<AuthInfo>) => {
     const deviceIds = req.body.map((p: any) => p.deviceId).filter((d: any) => !!d);
     this.validateOwnership(deviceIds, auth!);
-    await $repos.location.createPoints(req.body);
+
+    const points = await this.enrichWithLocationInfo(req.body as GPSPoint[]);
+    console.log(`Storing ${points.length} location point${points.length > 1 ? 's' : ''}`);
+    await $repos.location.createPoints(points);
     res.status(201).send();
   }
 
