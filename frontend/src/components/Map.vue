@@ -120,13 +120,12 @@ import FloatingButton from '../elements/FloatingButton.vue';
 import GPSPoint from '../models/GPSPoint';
 import LocationQuery from '../models/LocationQuery';
 import LocationQueryMixin from '../mixins/LocationQuery.vue';
-import LocationStats from '../models/LocationStats';
 import MapSelectOverlay from './MapSelectOverlay.vue';
 import MapView from '../mixins/MapView.vue';
 import Paginate from '../mixins/Paginate.vue';
 import Points from '../mixins/Points.vue';
 import Routes from '../mixins/Routes.vue';
-import StatsRequest from '../models/StatsRequest';
+import StatsMixin from '../mixins/Stats.vue';
 import Timeline from './Timeline.vue';
 import TimelineMetricsConfiguration from '../models/TimelineMetricsConfiguration';
 import URLQueryHandler from '../mixins/URLQueryHandler.vue';
@@ -143,6 +142,7 @@ export default {
     Paginate,
     Points,
     Routes,
+    StatsMixin,
     URLQueryHandler,
   ],
 
@@ -312,22 +312,6 @@ export default {
       const oldQuery = { ...this.locationQuery }
       this.locationQuery.minId = this.locationQuery.maxId = null
       await this.processQueryChange(this.locationQuery, oldQuery)
-    },
-
-    async getCountries(): Promise<Country[]> {
-      return (
-        await this.getStats(
-          new StatsRequest({
-            // @ts-ignore
-            userId: this.$root.user.id,
-            groupBy: ['country'],
-            order: 'desc',
-          })
-        )
-      )
-      .filter((record: LocationStats) => !!record.key.country)
-      .map((record: LocationStats) => Country.fromCode(record.key.country))
-      .filter((country: Optional<Country>) => !!country)
     },
 
     createMap(): Map {
