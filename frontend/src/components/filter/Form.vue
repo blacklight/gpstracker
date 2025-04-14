@@ -167,13 +167,10 @@
           </p>
         </label>
 
-        <Autocomplete
-          id="country"
-          name="country"
+        <CountrySelector
           placeholder="Filter by country"
-          allow-only-values
           :value="newFilter.country || ''"
-          :values="autocompleteCountries"
+          :countries="countries"
           :disabled="disabled"
           @input="newFilter.country = $event" />
       </div>
@@ -274,9 +271,8 @@
 <script lang="ts">
 import _ from 'lodash'
 
-import Autocomplete from '../../elements/Autocomplete.vue'
-import AutocompleteValue from '../../models/AutocompleteValue'
 import Country from '../../models/Country'
+import CountrySelector from '../../elements/CountrySelector.vue'
 import LocationQuery from '../../models/LocationQuery'
 import LocationQueryMixin from '../../mixins/LocationQuery.vue'
 import UserDevice from '../../models/UserDevice'
@@ -289,7 +285,7 @@ export default {
   ],
 
   components: {
-    Autocomplete,
+    CountrySelector,
   },
 
   props: {
@@ -313,13 +309,6 @@ export default {
   },
 
   computed: {
-    autocompleteCountries(): AutocompleteValue[] {
-      return this.countries.map((country: Country) => ({
-        value: country.code,
-        label: `${country.flag} ${country.name}`,
-        data: country,
-      }))
-    },
     maxDate() {
       return this.toLocalString(this.endPlusHours(new Date(), 0))
     }
