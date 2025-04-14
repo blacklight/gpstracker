@@ -6,16 +6,19 @@
         :id="id"
         :name="name"
         :placeholder="placeholder"
-        v-model="newValue"
+        :value="newValue"
         @focus="onFocus"
         @blur="onBlur"
+        @input="onInput"
+        @keydown="onKeyDown"
         ref="input"
       />
     </div>
     <div class="values" v-if="showValues" @click.stop>
-      <ul>
-        <li v-for="value in filteredValues"
+      <ul ref="values">
+        <li v-for="(value, i) in filteredValues"
             :key="value.value"
+            :class="{ 'selected': i === hoverValueIndex }"
             @click.stop="onItemClick(value)">
           {{ value.label }}
         </li>
@@ -64,6 +67,7 @@ export default {
 
   data() {
     return {
+      hoverValueIndex: -1,
       newValue: '' + this.value,
       showValues: false,
     };
@@ -96,24 +100,60 @@ export default {
         ])
       );
     },
+
+    hoverValue() {
+      return this.hoverValueIndex >= 0
+        ? this.filteredValues[this.hoverValueIndex]
+        : null;
+    },
   },
 
   methods: {
+    onInput(event: InputEvent) {
+      event?.stopPropagation();
+      this.newValue = (event.target as HTMLInputElement).value;
+      this.hoverValueIndex = -1;
+      this.$emit('input', this.newValue);
+    },
+
     onFocus() {
       this.showValues = true;
     },
 
     onBlur() {
+      this.hoverValueIndex = -1;
+      this.emitInput();
       setTimeout(() => {
         this.showValues = false;
-        this.emitInput();
-      }, 500);
+      }, 250);
     },
 
     onItemClick(value: AutocompleteValue) {
       this.newValue = value.value;
       this.showValues = false;
       this.emitInput();
+    },
+
+    onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Enter') {
+        if (this.hoverValue) {
+          this.onItemClick(this.hoverValue);
+        } else {
+          this.showValues = false;
+        }
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        this.showValues = false;
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        this.hoverValueIndex = (this.hoverValueIndex + 1) % this.filteredValues.length;
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.hoverValueIndex =
+          (this.hoverValueIndex - 1 + this.filteredValues.length) % this.filteredValues.length;
+      } else {
+        this.showValues = true;
+      }
     },
 
     emitInput() {
@@ -127,12 +167,34 @@ export default {
   },
 
   watch: {
-    value(newValue: string) {
-      this.newValue = newValue;
+    hoverValueIndex(newValue: number, oldValue: number) {
+      if (newValue !== oldValue) {
+        this.$nextTick(() => {
+          const list = this.$refs.values as HTMLUListElement;
+          if (list && list.children[newValue]) {
+            list.children[newValue].scrollIntoView({
+              block: 'nearest',
+              inline: 'nearest',
+            });
+          }
+        });
+      }
     },
 
-    newValue() {
-      this.emitInput();
+    showValues(newValue: boolean, oldValue: boolean) {
+      if (oldValue !== newValue) {
+        this.hoverValueIndex = -1;
+      }
+
+      if (newValue) {
+        this.$nextTick(() => {
+          this.$refs.input.focus();
+        });
+      }
+    },
+
+    value(newValue: string) {
+      this.newValue = newValue;
     },
   },
 }
@@ -169,7 +231,8 @@ export default {
         padding: 0.8em;
         cursor: pointer;
 
-        &:hover {
+        &:hover,
+        &.selected {
           background-color: var(--color-accent-bg);
         }
       }
