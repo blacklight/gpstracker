@@ -72,8 +72,14 @@
           <span class="value">{{ point.accuracy }} m</span>
         </p>
 
-        <p class="locality" v-if="point.locality">{{ point.locality }}</p>
-        <p class="postal-code" v-if="point.postalCode">{{ point.postalCode }}</p>
+        <p class="locality" v-if="point.locality">
+          <font-awesome-icon icon="fas fa-map-pin" />
+          {{ point.locality }}
+        </p>
+        <p class="postal-code" v-if="point.postalCode">
+          <font-awesome-icon icon="fas fa-envelope" />
+          {{ point.postalCode }}
+        </p>
         <p class="country" v-if="country">
           <span class="flag" v-if="countryFlag">{{ countryFlag }}&nbsp; </span>
           <span class="name">{{ country.name }}</span>,&nbsp;
@@ -295,6 +301,19 @@ export default {
     height: 0;
     min-width: 0;
     pointer-events: none;
+  }
+
+  .point-info {
+    p {
+      svg {
+        width: 1.1rem;
+        margin: 0;
+      }
+    }
+
+    a {
+      padding: 0;
+    }
   }
 
   p.latlng, p.altitude, p.speed {
