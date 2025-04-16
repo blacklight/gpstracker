@@ -90,7 +90,9 @@ export default {
           if (visitedCountries[key]) {
             return acc
           }
-          acc[key] = this.toAutocompleteValue(countries[key])
+
+          // @ts-ignore
+          acc[key] = this.toAutocompleteValue(countries[key] as any)
           return acc
         }, {}
       )

@@ -80,7 +80,7 @@ export default {
       }
 
       let matches = this.values.filter((value: AutocompleteValue) =>
-        value.value.toLowerCase() === this.newValue.toLowerCase()
+        value?.value?.toLowerCase() === this.newValue.toLowerCase()
       ) as AutocompleteValue[];
 
       if (!matches.length) {
@@ -188,7 +188,7 @@ export default {
 
       if (newValue) {
         this.$nextTick(() => {
-          this.$refs.input.focus();
+          (this.$refs.input as HTMLInputElement).focus();
         });
       }
     },

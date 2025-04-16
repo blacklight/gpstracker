@@ -36,6 +36,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/common.scss' as *;
+
 .modal-container {
   position: fixed;
   top: 0;
@@ -49,12 +51,20 @@ export default {
   z-index: 1000;
 
   .modal {
-    min-width: 30em;
     background-color: var(--color-background);
     border-radius: 0.5em;
     box-shadow: 0 0 1em rgba(0, 0, 0, 0.5);
     overflow: hidden;
     animation: fade-in 0.5s;
+
+    @include until(tablet) {
+      min-width: 90vw;
+      max-width: 95vw;
+    }
+
+    @include from(tablet) {
+      min-width: 500px;
+    }
 
     .modal-header {
       display: flex;
