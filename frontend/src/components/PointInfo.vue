@@ -29,8 +29,10 @@
           {{ speedKmH }} km/h
         </p>
 
+        <!-- @vue-ignore -->
         <form class="description editor" @submit.prevent="editPoint" v-if="editDescription">
           <div class="row">
+            <!-- @vue-ignore -->
             <textarea
               :value="point.description"
               @keydown.enter="editPoint"
@@ -87,18 +89,36 @@
         </p>
         <p class="timestamp" v-if="timeString">{{ timeString }}</p>
 
-        <div class="remove">
-          <button title="Remove" @click="$emit('remove', point)">
+        <div class="buttons">
+          <button title="Edit" class="edit" @click="showEditModal = true">
+            <font-awesome-icon icon="fas fa-edit" />&nbsp; Edit
+          </button>
+
+          <button title="Remove" class="remove" @click="$emit('remove', point)">
             <font-awesome-icon icon="fas fa-trash-alt" />&nbsp; Remove
           </button>
         </div>
       </div>
     </div>
+
+    <Modal :visible="showEditModal" @close="showEditModal = false">
+      <template #title>
+        Edit Point
+      </template>
+
+      <EditPointInfo
+        :device="device"
+        :point="newValue"
+        @close="showEditModal = false"
+        @edit="editPoint" />
+    </Modal>
   </div>
 </template>
 
 <script lang="ts">
+import EditPointInfo from './EditPointInfo.vue';
 import Map from 'ol/Map';
+import Modal from '../elements/Modal.vue';
 import Overlay from 'ol/Overlay';
 import type { TCountryCode } from 'countries-list';
 import { getCountryData, getEmojiFlag } from 'countries-list';
@@ -110,6 +130,11 @@ import UserDevice from '../models/UserDevice';
 export default {
   emit: ['close', 'edit', 'remove'],
   mixins: [Dates],
+  components: {
+    EditPointInfo,
+    Modal,
+  },
+
   props: {
     device: {
       type: [UserDevice, null],
@@ -121,9 +146,11 @@ export default {
 
   data() {
     return {
-      newValue: {} as GPSPoint,
+      // @ts-ignore
+      newValue: this.point ? new GPSPoint({ ...this.point }) : null as GPSPoint | null,
       editDescription: false,
       popup: null as Overlay | null,
+      showEditModal: false,
     }
   },
 
@@ -217,10 +244,22 @@ export default {
       map.addOverlay(this.popup)
     },
 
-    editPoint() {
-      this.newValue.description = (this.$refs.description as HTMLTextAreaElement).value
-      this.$emit('edit', this.newValue)
+    editPoint(newValue: GPSPoint | null | undefined) {
       this.editDescription = false
+
+      // If no new structured value is provided, then only edit the description
+      if (newValue == null) {
+        if (this.newValue) {
+          this.newValue.description = (this.$refs.description as HTMLTextAreaElement).value
+        }
+
+        this.$emit('edit', this.newValue)
+        return
+      }
+
+      // Otherwise, propagate the whole new value
+      this.newValue = newValue
+      this.$emit('edit', this.newValue)
     },
 
     onDescriptionBlur() {
@@ -408,17 +447,30 @@ export default {
     font-weight: bold;
     font-size: 0.9em;
   }
+}
 
-  .remove {
-    font-size: 0.85em;
-    margin-top: 0.5em;
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  margin-top: 0.5em;
 
-    button {
-      width: 100%;
-      background: none;
-      border: none;
+  button {
+    width: 100%;
+    background: none;
+    border: none;
+    margin-left: -0.5em;
+
+    &.edit {
+      color: var(--color-accent);
+
+      &:hover {
+        color: var(--color-accent-bg);
+      }
+    }
+
+    &.remove {
       color: var(--vt-c-red-fg-light);
-      margin-left: -0.5em;
 
       &:hover {
         color: var(--vt-c-red-fg-dark);
