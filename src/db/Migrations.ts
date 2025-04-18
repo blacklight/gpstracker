@@ -9,7 +9,7 @@ class Migrations {
       storage: new SequelizeStorage({ sequelize: db }),
       context: db.getQueryInterface(),
       migrations: {
-        glob: '**/db/migrations/*.*s',
+        glob: '**/db/migrations/*.js',
       },
       logger: console,
     }) as Umzug;
