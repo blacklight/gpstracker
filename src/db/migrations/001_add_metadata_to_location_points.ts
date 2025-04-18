@@ -25,7 +25,11 @@ async function removeLocationHistoryColumns(query: { context: any }) {
 
 const addMetadataToLocationPoints = {
   up: async (query: { context: any }) => {
-    await addLocationHistoryColumns({ context: query.context });
+    try {
+      await addLocationHistoryColumns({ context: query.context });
+    } catch (error) {
+      console.warn('Error adding metadata columns to location points:', error);
+    }
   },
 
   down: async (query: { context: any }) => {
